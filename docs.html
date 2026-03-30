@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ulimi API Docs — Developer Reference</title>
+  <meta name="description" content="Ulimi API — Trans-African dictionary. REST API reference, authentication, endpoints, and examples."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0E1610;
+      --surface:  #152018;
+      --surface2: #1D2B25;
+      --surface3: #243324;
+      --primary:  #3DBD8F;
+      --primary-l:#85D9B8;
+      --primary-d:#1D9E75;
+      --accent:   #C8873A;
+      --accent-l: #E8AA6A;
+      --text:     #F2F0EB;
+      --muted:    #8BA898;
+      --faint:    #4A6355;
+      --border:   rgba(61,189,143,0.12);
+      --border2:  rgba(61,189,143,0.25);
+      --red:      #E24B4A;
+      --blue:     #85B7EB;
+      --yellow:   #EFD260;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      line-height: 1.7;
+      overflow-x: hidden;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      grid-template-rows: 56px 1fr;
+      min-height: 100vh;
+    }
+
+    /* ── TOP NAV ── */
+    header {
+      grid-column: 1 / -1;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px;
+      background: var(--surface);
+      border-bottom: 0.5px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 10px; }
+    .header-mark {
+      width: 30px; height: 30px; border-radius: 6px;
+      background: var(--surface2); border: 0.5px solid var(--primary);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .header-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px; font-weight: 500; color: var(--text);
+    }
+    .header-badge {
+      font-size: 10px; font-weight: 500; letter-spacing: 0.08em;
+      background: rgba(61,189,143,0.1); color: var(--primary);
+      border: 0.5px solid rgba(61,189,143,0.25);
+      padding: 2px 8px; border-radius: 3px; text-transform: uppercase;
+    }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .header-right a {
+      font-size: 12px; color: var(--muted); text-decoration: none;
+      transition: color 0.2s;
+    }
+    .header-right a:hover { color: var(--text); }
+    .header-right .back-link {
+      color: var(--primary); border: 0.5px solid var(--border2);
+      padding: 5px 14px; border-radius: 4px; font-size: 11px;
+      letter-spacing: 0.04em;
+    }
+    .header-right .back-link:hover { background: rgba(61,189,143,0.08); }
+
+    /* ── SIDEBAR ── */
+    aside {
+      background: var(--surface);
+      border-right: 0.5px solid var(--border);
+      padding: 24px 0;
+      overflow-y: auto;
+      position: sticky; top: 56px;
+      height: calc(100vh - 56px);
+    }
+    .sidebar-section { margin-bottom: 24px; }
+    .sidebar-label {
+      font-size: 10px; font-weight: 500; letter-spacing: 0.12em;
+      color: var(--faint); text-transform: uppercase;
+      padding: 0 20px; margin-bottom: 6px;
+    }
+    .sidebar-link {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 20px; font-size: 13px; color: var(--muted);
+      text-decoration: none; transition: all 0.15s; border-left: 2px solid transparent;
+    }
+    .sidebar-link:hover { color: var(--text); background: rgba(61,189,143,0.04); }
+    .sidebar-link.active { color: var(--primary); border-left-color: var(--primary); background: rgba(61,189,143,0.06); }
+    .method-badge {
+      font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 400;
+      padding: 1px 5px; border-radius: 3px; letter-spacing: 0.04em;
+    }
+    .get  { background: rgba(61,189,143,0.15); color: var(--primary); }
+    .post { background: rgba(200,135,58,0.15); color: var(--accent-l); }
+
+    /* ── MAIN CONTENT ── */
+    main {
+      padding: 40px 56px;
+      overflow-y: auto;
+      max-width: 860px;
+    }
+
+    /* ── PAGE TITLE ── */
+    .page-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px; font-weight: 700; color: var(--text);
+      margin-bottom: 8px; line-height: 1.1;
+    }
+    .page-title em { font-style: italic; color: var(--primary); }
+    .page-intro { font-size: 15px; color: var(--muted); max-width: 560px; margin-bottom: 40px; line-height: 1.7; }
+
+    /* ── BASE URL BANNER ── */
+    .base-url {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--surface2); border: 0.5px solid var(--border2);
+      border-radius: 8px; padding: 14px 18px; margin-bottom: 48px;
+    }
+    .base-url-label { font-size: 11px; color: var(--muted); font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; flex-shrink: 0; }
+    .base-url-value { font-family: 'DM Mono', monospace; font-size: 14px; color: var(--primary); }
+    .base-url-copy {
+      margin-left: auto; font-size: 11px; color: var(--muted);
+      background: transparent; border: 0.5px solid var(--border);
+      padding: 4px 10px; border-radius: 4px; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+    }
+    .base-url-copy:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* ── SECTION ANCHORS ── */
+    .doc-section { margin-bottom: 56px; }
+    .doc-section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px; font-weight: 700; color: var(--text);
+      margin-bottom: 8px; padding-bottom: 10px;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .doc-section-sub { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.65; }
+
+    /* ── ENDPOINT CARDS ── */
+    .endpoint {
+      background: var(--surface); border: 0.5px solid var(--border);
+      border-radius: 10px; overflow: hidden; margin-bottom: 16px;
+    }
+    .endpoint-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 18px; border-bottom: 0.5px solid var(--border);
+      cursor: pointer; transition: background 0.15s;
+    }
+    .endpoint-header:hover { background: var(--surface2); }
+    .method {
+      font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 400;
+      padding: 3px 8px; border-radius: 4px; letter-spacing: 0.05em;
+      min-width: 46px; text-align: center; flex-shrink: 0;
+    }
+    .endpoint-path {
+      font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text); flex: 1;
+    }
+    .endpoint-path .param { color: var(--accent-l); }
+    .endpoint-desc { font-size: 12px; color: var(--muted); }
+    .endpoint-body { padding: 20px 18px; }
+    .params-label {
+      font-size: 10px; font-weight: 500; letter-spacing: 0.1em;
+      color: var(--faint); text-transform: uppercase; margin-bottom: 10px;
+    }
+    .param-row {
+      display: grid; grid-template-columns: 140px 80px 1fr;
+      gap: 12px; padding: 9px 0; border-bottom: 0.5px solid var(--border);
+      font-size: 12px; align-items: baseline;
+    }
+    .param-row:last-child { border-bottom: none; }
+    .param-name { font-family: 'DM Mono', monospace; color: var(--primary); }
+    .param-type { color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; }
+    .param-desc { color: var(--muted); line-height: 1.5; }
+    .param-required {
+      font-size: 9px; font-weight: 500; background: rgba(226,75,74,0.15);
+      color: var(--red); padding: 1px 5px; border-radius: 3px;
+      letter-spacing: 0.04em; margin-left: 4px; vertical-align: middle;
+    }
+    .param-optional {
+      font-size: 9px; font-weight: 500; background: rgba(139,168,152,0.15);
+      color: var(--muted); padding: 1px 5px; border-radius: 3px;
+      letter-spacing: 0.04em; margin-left: 4px; vertical-align: middle;
+    }
+
+    /* ── CODE BLOCKS ── */
+    .code-example { margin-top: 18px; }
+    .code-tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 0.5px solid var(--border); }
+    .code-tab {
+      font-size: 11px; padding: 7px 14px; cursor: pointer;
+      color: var(--muted); border-bottom: 2px solid transparent;
+      transition: all 0.15s; background: none; border-top: none;
+      border-left: none; border-right: none; font-family: 'DM Sans', sans-serif;
+    }
+    .code-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .code-block {
+      background: var(--bg); border-radius: 0 0 8px 8px;
+      border: 0.5px solid var(--border); border-top: none;
+    }
+    .code-bar {
+      display: flex; align-items: center; gap: 6px;
+      padding: 9px 14px; border-bottom: 0.5px solid var(--border);
+    }
+    .code-dot { width: 9px; height: 9px; border-radius: 50%; }
+    .code-label { font-size: 11px; color: var(--faint); margin-left: 4px; font-family: 'DM Mono', monospace; }
+    pre {
+      padding: 18px; font-family: 'DM Mono', monospace;
+      font-size: 12px; line-height: 1.85; overflow-x: auto;
+      color: var(--muted);
+    }
+    .k  { color: var(--primary); }
+    .s  { color: var(--yellow); }
+    .n  { color: var(--blue); }
+    .b  { color: #A78BFA; }
+    .c  { color: var(--faint); font-style: italic; }
+    .url-k { color: var(--accent-l); }
+
+    /* ── RESPONSE EXAMPLE ── */
+    .response-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 14px; background: var(--surface);
+      border-bottom: 0.5px solid var(--border);
+    }
+    .status-200 {
+      font-family: 'DM Mono', monospace; font-size: 11px;
+      background: rgba(61,189,143,0.12); color: var(--primary);
+      padding: 2px 8px; border-radius: 3px;
+    }
+    .response-label { font-size: 11px; color: var(--muted); }
+
+    /* ── CATEGORY TABLE ── */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .data-table th {
+      text-align: left; padding: 9px 14px; font-size: 10px;
+      font-weight: 500; color: var(--faint); text-transform: uppercase;
+      letter-spacing: 0.1em; background: var(--surface2);
+      border-bottom: 0.5px solid var(--border);
+    }
+    .data-table td { padding: 10px 14px; border-bottom: 0.5px solid var(--border); color: var(--muted); }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table code { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--primary); }
+    .table-wrap {
+      background: var(--surface); border: 0.5px solid var(--border);
+      border-radius: 8px; overflow: hidden; margin-bottom: 20px;
+    }
+
+    /* ── RATE LIMIT CALLOUT ── */
+    .callout {
+      border-radius: 8px; padding: 16px 18px; margin-bottom: 20px;
+      font-size: 13px; line-height: 1.6;
+    }
+    .callout.info { background: rgba(61,189,143,0.07); border: 0.5px solid rgba(61,189,143,0.2); color: var(--primary-l); }
+    .callout.warn { background: rgba(200,135,58,0.07); border: 0.5px solid rgba(200,135,58,0.2); color: var(--accent-l); }
+    .callout strong { font-weight: 500; }
+
+    /* ── SDK INSTALL ── */
+    .install-block {
+      background: var(--surface); border: 0.5px solid var(--border);
+      border-radius: 8px; overflow: hidden; margin-bottom: 16px;
+    }
+    .install-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px; border-bottom: 0.5px solid var(--border);
+      font-size: 12px; color: var(--muted);
+    }
+    .install-header span { font-family: 'DM Mono', monospace; color: var(--text); }
+
+    @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    main { animation: fadeIn 0.4s ease both; }
+
+    @media (max-width: 768px) {
+      body { grid-template-columns: 1fr; }
+      aside { display: none; }
+      main { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="header-mark">
+      <svg width="16" height="16" viewBox="0 0 20 20">
+        <ellipse cx="10" cy="10" rx="7" ry="4.5" fill="none" stroke="#3DBD8F" stroke-width="1.5"/>
+        <path d="M10 5.5 Q14.5 7.5 14.5 10 Q14.5 12.5 10 14.5" fill="none" stroke="#3DBD8F" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="12.5" cy="10" r="1.5" fill="#3DBD8F"/>
+      </svg>
+    </div>
+    <span class="header-name">ulimi</span>
+    <span class="header-badge">API Docs</span>
+  </div>
+  <div class="header-right">
+    <a href="#concepts">Concepts</a>
+    <a href="#languages">Languages</a>
+    <a href="#contributions">Contributions</a>
+    <a href="/">← Dictionary</a>
+    <a href="https://github.com/ceddyville/ulimi-api" class="back-link">GitHub</a>
+  </div>
+</header>
+
+<aside>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Getting started</div>
+    <a href="#intro" class="sidebar-link active">Introduction</a>
+    <a href="#base-url" class="sidebar-link">Base URL</a>
+    <a href="#auth" class="sidebar-link">Authentication</a>
+    <a href="#errors" class="sidebar-link">Errors</a>
+    <a href="#rate-limits" class="sidebar-link">Rate limits</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Concepts</div>
+    <a href="#list-concepts" class="sidebar-link"><span class="method-badge get">GET</span> List concepts</a>
+    <a href="#get-concept" class="sidebar-link"><span class="method-badge get">GET</span> Get concept</a>
+    <a href="#search" class="sidebar-link"><span class="method-badge get">GET</span> Search</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Languages</div>
+    <a href="#list-languages" class="sidebar-link"><span class="method-badge get">GET</span> List languages</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Contributions</div>
+    <a href="#submit" class="sidebar-link"><span class="method-badge post">POST</span> Submit word</a>
+    <a href="#vote" class="sidebar-link"><span class="method-badge post">POST</span> Vote</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Reference</div>
+    <a href="#categories" class="sidebar-link">Categories</a>
+    <a href="#models" class="sidebar-link">Data models</a>
+    <a href="#changelog" class="sidebar-link">Changelog</a>
+  </div>
+</aside>
+
+<main>
+
+  <div id="intro" class="doc-section">
+    <div class="page-title">Ulimi <em>API</em></div>
+    <p class="page-intro">
+      A living, community-contributed dictionary of indigenous African words across languages,
+      ethnic groups, and pre-colonial contexts. Free to use. Open source.
+      Part of the Imara Tech ecosystem.
+    </p>
+
+    <div id="base-url" class="base-url">
+      <span class="base-url-label">Base URL</span>
+      <span class="base-url-value">https://ulimi.dev/api/v1</span>
+      <button class="base-url-copy" onclick="navigator.clipboard.writeText('https://ulimi.dev/api/v1');this.textContent='Copied!'">Copy</button>
+    </div>
+
+    <div class="callout info">
+      <strong>Open API —</strong> All read endpoints are public and require no authentication. Submit endpoints (POST) accept anonymous contributions but authenticated users get contribution history.
+    </div>
+  </div>
+
+  <div id="concepts" class="doc-section">
+    <div class="doc-section-title">Concepts</div>
+    <p class="doc-section-sub">A concept is the core entity — the idea or thing, language-agnostic. Each concept has many translations across different languages and ethnic groups.</p>
+
+    <div id="list-concepts" class="endpoint">
+      <div class="endpoint-header">
+        <span class="method get">GET</span>
+        <span class="endpoint-path">/concepts/</span>
+        <span class="endpoint-desc">List all verified concepts</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="params-label">Query parameters</div>
+        <div class="param-row">
+          <span class="param-name">category<span class="param-optional">optional</span></span>
+          <span class="param-type">string</span>
+          <span class="param-desc">Filter by category slug — e.g. <code style="font-family:monospace;font-size:11px;color:var(--primary)">animals</code>, <code style="font-family:monospace;font-size:11px;color:var(--primary)">culture</code></span>
+        </div>
+        <div class="param-row">
+          <span class="param-name">search<span class="param-optional">optional</span></span>
+          <span class="param-type">string</span>
+          <span class="param-desc">Filter by English term. For cross-language search use <code style="font-family:monospace;font-size:11px;color:var(--primary)">/search/</code> instead.</span>
+        </div>
+        <div class="param-row">
+          <span class="param-name">page<span class="param-optional">optional</span></span>
+          <span class="param-type">integer</span>
+          <span class="param-desc">Page number. Default: 1. Page size: 20.</span>
+        </div>
+        <div class="code-example">
+          <div class="code-block">
+            <div class="code-bar">
+              <div class="code-dot" style="background:#8B3A2A"></div>
+              <div class="code-dot" style="background:#C8873A"></div>
+              <div class="code-dot" style="background:#2D4A35"></div>
+              <span class="code-label">curl</span>
+            </div>
+            <pre><span class="url-k">curl</span> https://ulimi.dev/api/v1/concepts/
+<span class="url-k">curl</span> https://ulimi.dev/api/v1/concepts/?category=animals
+<span class="url-k">curl</span> https://ulimi.dev/api/v1/concepts/?category=culture&page=2</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="get-concept" class="endpoint">
+      <div class="endpoint-header">
+        <span class="method get">GET</span>
+        <span class="endpoint-path">/concepts/<span class="param">{slug}</span>/</span>
+        <span class="endpoint-desc">Get a concept with all translations</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="params-label">Path parameters</div>
+        <div class="param-row">
+          <span class="param-name">slug<span class="param-required">required</span></span>
+          <span class="param-type">string</span>
+          <span class="param-desc">URL-safe concept slug — e.g. <code style="font-family:monospace;font-size:11px;color:var(--primary)">lion</code>, <code style="font-family:monospace;font-size:11px;color:var(--primary)">ubuntu</code>, <code style="font-family:monospace;font-size:11px;color:var(--primary)">sukuma-wiki</code></span>
+        </div>
+        <div class="code-example">
+          <div class="code-block">
+            <div class="code-bar">
+              <div class="code-dot" style="background:#8B3A2A"></div>
+              <div class="code-dot" style="background:#C8873A"></div>
+              <div class="code-dot" style="background:#2D4A35"></div>
+              <span class="code-label">response · 200 OK</span>
+            </div>
+            <pre>{
+  <span class="k">"id"</span>: <span class="s">"22222222-0000-0000-0000-000000000007"</span>,
+  <span class="k">"slug"</span>: <span class="s">"ubuntu"</span>,
+  <span class="k">"english_term"</span>: <span class="s">"Ubuntu / Humanity"</span>,
+  <span class="k">"category"</span>: <span class="s">"culture"</span>,
+  <span class="k">"precolonial_context"</span>: <span class="s">"A pan-African philosophy: 'I am because we are'..."</span>,
+  <span class="k">"verified"</span>: <span class="b">true</span>,
+  <span class="k">"translation_count"</span>: <span class="n">5</span>,
+  <span class="k">"translations"</span>: [
+    {
+      <span class="k">"id"</span>: <span class="s">"33333333-..."</span>,
+      <span class="k">"word"</span>: <span class="s">"Ubuntu"</span>,
+      <span class="k">"phonetic"</span>: <span class="s">"oo-BOON-too"</span>,
+      <span class="k">"cultural_note"</span>: <span class="s">"Umuntu ngumuntu ngabantu"</span>,
+      <span class="k">"is_precolonial"</span>: <span class="b">true</span>,
+      <span class="k">"verified"</span>: <span class="b">true</span>,
+      <span class="k">"language"</span>: {
+        <span class="k">"code"</span>: <span class="s">"zu"</span>,
+        <span class="k">"name"</span>: <span class="s">"Zulu"</span>,
+        <span class="k">"family"</span>: <span class="s">"Bantu (Nguni)"</span>,
+        <span class="k">"regions"</span>: [<span class="s">"South Africa"</span>]
+      },
+      <span class="k">"ethnic_group"</span>: {
+        <span class="k">"name"</span>: <span class="s">"Zulu"</span>,
+        <span class="k">"country_iso2"</span>: <span class="s">"ZA"</span>,
+        <span class="k">"kabila_id"</span>: <span class="s">"zulu-za-001"</span>
+      }
+    }
+  ]
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="search" class="endpoint">
+      <div class="endpoint-header">
+        <span class="method get">GET</span>
+        <span class="endpoint-path">/concepts/search/</span>
+        <span class="endpoint-desc">Cross-language search — any word, any language</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="callout warn" style="margin-bottom:16px">
+          <strong>This is the key endpoint.</strong> Unlike <code style="font-family:monospace;font-size:11px">/concepts/?search=</code>, this searches across ALL translation words simultaneously — so searching "simba" finds the Lion concept just as searching "lion" does.
+        </div>
+        <div class="params-label">Query parameters</div>
+        <div class="param-row">
+          <span class="param-name">q<span class="param-required">required</span></span>
+          <span class="param-type">string</span>
+          <span class="param-desc">The search term. Minimum 2 characters. Searches English terms and all translation words.</span>
+        </div>
+        <div class="param-row">
+          <span class="param-name">category<span class="param-optional">optional</span></span>
+          <span class="param-type">string</span>
+          <span class="param-desc">Narrow results to a category.</span>
+        </div>
+        <div class="code-example">
+          <div class="code-block">
+            <div class="code-bar">
+              <div class="code-dot" style="background:#8B3A2A"></div>
+              <div class="code-dot" style="background:#C8873A"></div>
+              <div class="code-dot" style="background:#2D4A35"></div>
+              <span class="code-label">curl</span>
+            </div>
+            <pre><span class="url-k">curl</span> "https://ulimi.dev/api/v1/concepts/search/?q=simba"
+<span class="url-k">curl</span> "https://ulimi.dev/api/v1/concepts/search/?q=lion&category=animals"
+<span class="url-k">curl</span> "https://ulimi.dev/api/v1/concepts/search/?q=ubuntu"</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="contributions" class="doc-section">
+    <div class="doc-section-title">Contributions</div>
+    <p class="doc-section-sub">Anyone can submit new words or corrections. All submissions enter a pending state, can be upvoted by the community, and go live only after admin review.</p>
+
+    <div id="submit" class="endpoint">
+      <div class="endpoint-header">
+        <span class="method post" style="background:rgba(200,135,58,0.15);color:var(--accent-l);">POST</span>
+        <span class="endpoint-path">/contributions/</span>
+        <span class="endpoint-desc">Submit a new word, translation, or correction</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="params-label">Three contribution types</div>
+        <div class="code-example">
+          <div class="code-block">
+            <div class="code-bar">
+              <div class="code-dot" style="background:#8B3A2A"></div>
+              <div class="code-dot" style="background:#C8873A"></div>
+              <div class="code-dot" style="background:#2D4A35"></div>
+              <span class="code-label">new_concept · new_translation · correction</span>
+            </div>
+            <pre><span class="c">// Type 1: Brand new concept</span>
+{
+  <span class="k">"contribution_type"</span>: <span class="s">"new_concept"</span>,
+  <span class="k">"contributor_name"</span>: <span class="s">"Achieng Otieno"</span>,
+  <span class="k">"contributor_note"</span>: <span class="s">"Native Luo speaker from Kisumu"</span>,
+  <span class="k">"proposed_data"</span>: {
+    <span class="k">"english_term"</span>: <span class="s">"Baobab tree"</span>,
+    <span class="k">"category"</span>: <span class="s">"food"</span>,
+    <span class="k">"word"</span>: <span class="s">"Uyombo"</span>,
+    <span class="k">"language_code"</span>: <span class="s">"luo"</span>,
+    <span class="k">"is_precolonial"</span>: <span class="b">true</span>
+  }
+}
+
+<span class="c">// Type 2: New translation for existing concept</span>
+{
+  <span class="k">"contribution_type"</span>: <span class="s">"new_translation"</span>,
+  <span class="k">"concept"</span>: <span class="s">"&lt;concept-uuid&gt;"</span>,
+  <span class="k">"proposed_data"</span>: {
+    <span class="k">"word"</span>: <span class="s">"Gyata"</span>,
+    <span class="k">"language_code"</span>: <span class="s">"tw"</span>
+  }
+}
+
+<span class="c">// Type 3: Correction to existing translation</span>
+{
+  <span class="k">"contribution_type"</span>: <span class="s">"correction"</span>,
+  <span class="k">"existing_translation"</span>: <span class="s">"&lt;translation-uuid&gt;"</span>,
+  <span class="k">"proposed_data"</span>: {
+    <span class="k">"phonetic"</span>: { <span class="k">"old"</span>: <span class="s">"SIM-ba"</span>, <span class="k">"new"</span>: <span class="s">"SIM-bah"</span> }
+  }
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="vote" class="endpoint">
+      <div class="endpoint-header">
+        <span class="method post" style="background:rgba(200,135,58,0.15);color:var(--accent-l);">POST</span>
+        <span class="endpoint-path">/contributions/<span class="param">{id}</span>/vote/</span>
+        <span class="endpoint-desc">Upvote or flag a pending contribution</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="code-example">
+          <div class="code-block">
+            <div class="code-bar">
+              <div class="code-dot" style="background:#8B3A2A"></div>
+              <div class="code-dot" style="background:#C8873A"></div>
+              <div class="code-dot" style="background:#2D4A35"></div>
+              <span class="code-label">body</span>
+            </div>
+            <pre>{ <span class="k">"vote_type"</span>: <span class="s">"up"</span> }   <span class="c">// or "flag"</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="categories" class="doc-section">
+    <div class="doc-section-title">Categories</div>
+    <p class="doc-section-sub">Use the category slug as a filter parameter on any concept endpoint.</p>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Slug</th><th>Label</th></tr></thead>
+        <tbody>
+          <tr><td><code>animals</code></td><td>Animals</td></tr>
+          <tr><td><code>food</code></td><td>Food & Plants</td></tr>
+          <tr><td><code>nature</code></td><td>Nature</td></tr>
+          <tr><td><code>family</code></td><td>Family & Social</td></tr>
+          <tr><td><code>culture</code></td><td>Culture & Governance</td></tr>
+          <tr><td><code>body</code></td><td>Body & Health</td></tr>
+          <tr><td><code>spiritual</code></td><td>Spiritual & Ceremonial</td></tr>
+          <tr><td><code>tools</code></td><td>Tools & Technology</td></tr>
+          <tr><td><code>geography</code></td><td>Geography & Place</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="rate-limits" class="doc-section">
+    <div class="doc-section-title">Rate limits</div>
+    <div class="callout info">
+      <strong>Public API —</strong> 100 requests per minute per IP. No API key required for read access. Authenticated users get higher limits. Contact <code style="font-family:monospace;font-size:12px">api@ulimi.dev</code> for bulk access.
+    </div>
+  </div>
+
+  <div id="changelog" class="doc-section">
+    <div class="doc-section-title">Changelog</div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Version</th><th>Date</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><code>v1.0</code></td><td>2025</td><td>Initial release — concepts, translations, contributions, Kabila sync</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+</body>
+</html>
