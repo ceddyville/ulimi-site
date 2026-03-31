@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { ConceptDetail } from "@/lib/types";
 
 interface ResultCardProps {
@@ -12,7 +13,7 @@ export default function ResultCard({ concept, onAddTranslation, onCorrect }: Res
   return (
     <div className="bg-cream border border-border rounded-[10px] overflow-hidden">
       {/* Header */}
-      <div className="bg-ink px-[22px] py-4 flex items-baseline gap-3.5">
+      <Link href={`/words/${concept.slug}`} className="bg-ink px-[22px] py-4 flex items-baseline gap-3.5 hover:bg-ink2 transition-colors">
         <span className="font-[family-name:var(--font-cormorant)] text-2xl font-semibold text-cream">
           {concept.english_term}
         </span>
@@ -22,7 +23,7 @@ export default function ResultCard({ concept, onAddTranslation, onCorrect }: Res
         <span className="ml-auto text-[10px] bg-cream/[0.08] text-ochre-l px-2.5 py-0.5 rounded-[3px] tracking-[0.07em] uppercase">
           {concept.category}
         </span>
-      </div>
+      </Link>
 
       {/* Pre-colonial context */}
       {concept.precolonial_context && (
