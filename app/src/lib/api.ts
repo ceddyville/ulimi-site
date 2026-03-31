@@ -42,7 +42,7 @@ export function getConcept(slug: string) {
 export function searchConcepts(q: string, category?: string) {
   const sp = new URLSearchParams({ q });
   if (category) sp.set("category", category);
-  return apiFetch<PaginatedResponse<ConceptDetail>>(
+  return apiFetch<ConceptDetail[]>(
     `/concepts/search/?${sp.toString()}`
   );
 }

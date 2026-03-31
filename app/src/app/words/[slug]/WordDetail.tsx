@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { ConceptDetail } from "@/lib/types";
+import { searchConcepts } from "@/lib/api";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import ContributeModal from "@/components/ContributeModal";
@@ -12,6 +14,7 @@ interface Props {
 }
 
 export default function WordDetail({ concept }: Props) {
+  const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<"new_translation" | "correction">("new_translation");
   const [prefill, setPrefill] = useState<{
@@ -20,6 +23,24 @@ export default function WordDetail({ concept }: Props) {
     langName?: string;
     word?: string;
   }>({});
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = useCallback(async (q: string) => {
+    const trimmed = q.trim();
+    if (!trimmed) return;
+    try {
+      const results = await searchConcepts(trimmed);
+      if (results.length === 1) {
+        router.push(`/words/${results[0].slug}`);
+      } else if (results.length > 1) {
+        router.push(`/?q=${encodeURIComponent(trimmed)}#search`);
+      } else {
+        router.push(`/?q=${encodeURIComponent(trimmed)}#search`);
+      }
+    } catch {
+      router.push(`/?q=${encodeURIComponent(trimmed)}#search`);
+    }
+  }, [router]);
 
   function openAddTranslation() {
     setModalType("new_translation");
@@ -39,10 +60,30 @@ export default function WordDetail({ concept }: Props) {
 
       <main className="max-w-[900px] mx-auto px-5 pt-10 pb-20">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-[12px] text-ink3 mb-8">
+        <div className="flex items-center gap-2 text-[12px] text-ink3 mb-5">
           <Link href="/" className="hover:text-ochre-d transition-colors">Dictionary</Link>
           <span className="text-ink3/40">/</span>
           <span className="text-ink2">{concept.english_term}</span>
+        </div>
+
+        {/* Search another word */}
+        <div className="flex gap-2.5 mb-8">
+          <input
+            type="text"
+            className="flex-1 bg-cream border border-border rounded px-[18px] py-[11px] text-ink text-[14px] font-[family-name:var(--font-jost)] outline-none transition-colors focus:border-ochre placeholder:text-ink3"
+            placeholder="Search another word — simba, ubuntu, mama…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSearch(searchQuery);
+            }}
+          />
+          <button
+            onClick={() => handleSearch(searchQuery)}
+            className="bg-ink text-cream px-5 py-[11px] rounded text-[12px] font-medium tracking-[0.06em] uppercase cursor-pointer font-[family-name:var(--font-jost)] transition-colors hover:bg-ochre-d"
+          >
+            Search
+          </button>
         </div>
 
         {/* Header */}
