@@ -36,9 +36,6 @@ export default function Nav() {
         <Link href="/#contribute" className="text-ink3 text-[13px] no-underline tracking-[0.02em] hover:text-ink transition-colors">
           Contribute
         </Link>
-        <Link href="/docs" className="text-ink3 text-[13px] no-underline tracking-[0.02em] hover:text-ink transition-colors">
-          Developers
-        </Link>
         <Link
           href="/docs"
           className="bg-ink text-cream px-5 py-2 rounded text-[12px] font-medium tracking-[0.06em] uppercase no-underline hover:bg-ochre-d transition-colors"
