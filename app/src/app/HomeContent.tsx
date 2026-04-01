@@ -126,15 +126,15 @@ export default function HomeContent() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 max-w-[1000px] mx-auto mb-[60px] px-12 gap-px bg-border border border-border rounded-lg overflow-hidden animate-[fadeUp_0.6s_0.1s_ease_both]">
         {[
-          { num: "20", label: "Languages" },
-          { num: "196", label: "Words" },
-          { num: "22", label: "Countries" },
-          { num: "100%", label: "Open source" },
+          { num: "20", label: "Languages", href: "/browse/languages" },
+          { num: "196", label: "Words", href: "/browse/categories" },
+          { num: "22", label: "Countries", href: "/browse/countries" },
+          { num: "100%", label: "Open source", href: "https://github.com/ceddyville/ulimi-api" },
         ].map((s) => (
-          <div key={s.label} className="bg-cream px-[22px] py-[30px] text-center">
-            <div className="font-[family-name:var(--font-cormorant)] text-[44px] font-bold text-ink leading-none">{s.num}</div>
+          <a key={s.label} href={s.href} className="bg-cream px-[22px] py-[30px] text-center no-underline hover:bg-ochre/[0.04] transition-colors group">
+            <div className="font-[family-name:var(--font-cormorant)] text-[44px] font-bold text-ink leading-none group-hover:text-ochre-d transition-colors">{s.num}</div>
             <div className="text-[11px] text-ink3 mt-1.5 tracking-[0.07em] uppercase">{s.label}</div>
-          </div>
+          </a>
         ))}
       </div>
 
