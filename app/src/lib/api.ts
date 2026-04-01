@@ -39,6 +39,19 @@ export function listConcepts(params?: {
   );
 }
 
+export async function listAllConcepts(params?: { category?: string }) {
+  const all: ConceptListItem[] = [];
+  let page = 1;
+  let hasNext = true;
+  while (hasNext) {
+    const data = await listConcepts({ ...params, page });
+    all.push(...data.results);
+    hasNext = !!data.next;
+    page++;
+  }
+  return all;
+}
+
 export function getConcept(slug: string) {
   return apiFetch<ConceptDetail>(`/concepts/${encodeURIComponent(slug)}/`);
 }

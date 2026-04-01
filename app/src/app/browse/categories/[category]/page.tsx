@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { listConcepts, listCategories } from "@/lib/api";
+import { listAllConcepts, listCategories } from "@/lib/api";
 import type { ConceptListItem } from "@/lib/types";
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -44,8 +44,7 @@ export default async function CategoryDetailPage({ params }: Props) {
 
   let concepts: ConceptListItem[];
   try {
-    const data = await listConcepts({ category });
-    concepts = data.results;
+    concepts = await listAllConcepts({ category });
   } catch {
     concepts = [];
   }
