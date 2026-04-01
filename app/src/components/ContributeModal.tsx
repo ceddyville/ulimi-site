@@ -70,6 +70,34 @@ const SUCCESS_MESSAGES: Record<ContributionType, string> = {
     "Your correction has been submitted. The admin will review the before/after diff before applying it.",
 };
 
+// "Thank you very much" in each language
+const THANK_YOU: Record<string, string> = {
+  af: "Baie dankie",
+  am: "Ameseginalehu",
+  bxk: "Orio muno",
+  ebu: "Ni wega muno",
+  guz: "Mbuya muno",
+  ha: "Na gode sosai",
+  hz: "Okuhepa",
+  ki: "N\u00fc ngatho",
+  luo: "Erokamano ahinya",
+  mas: "Ashe oleng",
+  nd: "Siyabonga kakhulu",
+  nyf: "Namvera sana",
+  sn: "Mazvita chaizvo",
+  so: "Mahadsanid",
+  ss: "Siyabonga kakhulu",
+  st: "Kea leboha haholo",
+  sw: "Asante sana",
+  tn: "Ke a leboga thata",
+  ts: "Ndza khensa ngopfu",
+  tw: "Medaase pii",
+  ve: "Ndo livhuwa nga maanda",
+  xh: "Enkosi kakhulu",
+  yo: "E \u1E63\u00E9 pupọ",
+  zu: "Ngiyabonga kakhulu",
+};
+
 export default function ContributeModal({ open, onClose, initialType, prefill }: ModalProps) {
   const [activeTab, setActiveTab] = useState<ContributionType>(initialType);
   const [submitting, setSubmitting] = useState(false);
@@ -279,7 +307,7 @@ export default function ContributeModal({ open, onClose, initialType, prefill }:
               </svg>
             </div>
             <div className="font-[family-name:var(--font-cormorant)] text-[26px] font-bold text-ink mb-2.5">
-              Asante sana
+              {THANK_YOU[activeTab === "new_concept" ? lang : activeTab === "new_translation" ? lang2 : ""] || THANK_YOU.sw}
             </div>
             <p className="text-[13px] text-ink3 leading-[1.65] max-w-[360px] mx-auto mb-6">
               {SUCCESS_MESSAGES[activeTab]}
