@@ -71,7 +71,7 @@ export default async function WordPage({ params, searchParams }: Props) {
       ]);
       featuredLang = langInfo;
       moreInLanguage = langTranslations
-        .filter((t) => t.concept_slug !== concept.slug)
+        .filter((t) => t.concept_slug !== concept.slug && t.concept_category === concept.category)
         .slice(0, 8);
     } catch {
       // Fall back to default view

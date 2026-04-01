@@ -9,6 +9,19 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import ContributeModal from "@/components/ContributeModal";
 
+const CATEGORY_LABELS: Record<string, string> = {
+  animals: "Animals",
+  food: "Food & Plants",
+  nature: "Nature",
+  family: "Family & Social",
+  culture: "Culture & Governance",
+  body: "Body & Health",
+  spiritual: "Spiritual & Ceremonial",
+  tools: "Tools & Technology",
+  geography: "Geography & Place",
+  other: "Other",
+};
+
 interface Props {
   concept: ConceptDetail;
   similarWords: ConceptListItem[];
@@ -280,7 +293,7 @@ export default function WordDetail({ concept, similarWords, featuredLang, moreIn
         {featuredLang && moreInLanguage.length > 0 && (
           <div className="mt-10">
             <h2 className="text-[11px] font-medium text-ink3 tracking-[0.1em] uppercase mb-4">
-              More in{" "}
+              More {CATEGORY_LABELS[concept.category] ?? concept.category} in{" "}
               <Link
                 href={`/browse/languages/${featuredLang.code}`}
                 className="text-ochre-d no-underline hover:text-ochre transition-colors"
