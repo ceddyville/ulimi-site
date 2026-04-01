@@ -1,5 +1,6 @@
-import { getConcept } from "@/lib/api";
+import { getConcept, listConcepts } from "@/lib/api";
 import type { Metadata } from "next";
+import type { ConceptListItem } from "@/lib/types";
 import Link from "next/link";
 import WordDetail from "./WordDetail";
 
@@ -45,5 +46,16 @@ export default async function WordPage({ params }: Props) {
     );
   }
 
-  return <WordDetail concept={concept} />;
+  // Fetch similar words from same category (exclude current concept)
+  let similarWords: ConceptListItem[] = [];
+  try {
+    const data = await listConcepts({ category: concept.category });
+    similarWords = data.results
+      .filter((c) => c.slug !== concept.slug)
+      .slice(0, 8);
+  } catch {
+    // Non-critical — page still works without similar words
+  }
+
+  return <WordDetail concept={concept} similarWords={similarWords} />;
 }

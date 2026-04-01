@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import type { ConceptDetail } from "@/lib/types";
+import type { ConceptDetail, ConceptListItem } from "@/lib/types";
 import { searchConcepts } from "@/lib/api";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
@@ -11,9 +11,10 @@ import ContributeModal from "@/components/ContributeModal";
 
 interface Props {
   concept: ConceptDetail;
+  similarWords: ConceptListItem[];
 }
 
-export default function WordDetail({ concept }: Props) {
+export default function WordDetail({ concept, similarWords }: Props) {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<"new_translation" | "correction">("new_translation");
@@ -92,9 +93,12 @@ export default function WordDetail({ concept }: Props) {
             <h1 className="font-[family-name:var(--font-cormorant)] text-[42px] font-bold text-ink leading-tight">
               {concept.english_term}
             </h1>
-            <span className="text-[11px] bg-ochre/[0.1] text-ochre-d px-2.5 py-0.5 rounded-[3px] tracking-[0.07em] uppercase font-medium">
+            <Link
+              href={`/browse/categories/${concept.category}`}
+              className="text-[11px] bg-ochre/[0.1] text-ochre-d px-2.5 py-0.5 rounded-[3px] tracking-[0.07em] uppercase font-medium no-underline hover:bg-ochre/[0.2] transition-colors"
+            >
               {concept.category}
-            </span>
+            </Link>
           </div>
           <p className="text-[14px] text-ink3">
             {concept.translation_count} translation{concept.translation_count !== 1 ? "s" : ""} across African languages
@@ -142,9 +146,12 @@ export default function WordDetail({ concept }: Props) {
                   className="relative group px-5 py-4 border-r border-b border-border last:border-b-0"
                 >
                   <div className="flex items-center gap-2 mb-1.5">
-                    <span className="text-[10px] font-medium text-ink3 tracking-[0.08em] uppercase">
+                    <Link
+                      href={`/browse/languages/${t.language.code}`}
+                      className="text-[10px] font-medium text-ink3 tracking-[0.08em] uppercase no-underline hover:text-ochre-d transition-colors"
+                    >
                       {t.language.name}
-                    </span>
+                    </Link>
                     {t.is_precolonial && (
                       <span className="text-[9px] bg-forest/[0.08] text-forest px-1.5 py-px rounded tracking-[0.05em]">
                         pre-colonial
@@ -198,6 +205,37 @@ export default function WordDetail({ concept }: Props) {
             + Add translation
           </button>
         </div>
+
+        {/* Similar words */}
+        {similarWords.length > 0 && (
+          <div className="mt-10">
+            <h2 className="text-[11px] font-medium text-ink3 tracking-[0.1em] uppercase mb-4">
+              More in{" "}
+              <Link
+                href={`/browse/categories/${concept.category}`}
+                className="text-ochre-d no-underline hover:text-ochre transition-colors"
+              >
+                {concept.category}
+              </Link>
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-0 bg-cream border border-border rounded-lg overflow-hidden">
+              {similarWords.map((w) => (
+                <Link
+                  key={w.id}
+                  href={`/words/${w.slug}`}
+                  className="block px-4 py-3.5 border-r border-b border-border hover:bg-ochre/[0.03] transition-colors group no-underline"
+                >
+                  <div className="font-[family-name:var(--font-cormorant)] text-[20px] font-semibold text-ink group-hover:text-ochre-d transition-colors leading-tight">
+                    {w.english_term}
+                  </div>
+                  <div className="text-[11px] text-ink3 mt-0.5">
+                    {w.translation_count} translation{w.translation_count !== 1 ? "s" : ""}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
 
       <Footer />
