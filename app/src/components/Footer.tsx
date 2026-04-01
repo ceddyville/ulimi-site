@@ -26,6 +26,20 @@ export default function Footer() {
         </div>
         <div>
           <div className="text-[10px] font-medium tracking-[0.12em] uppercase text-cream/35 mb-2.5">
+            Browse
+          </div>
+          <Link href="/browse/categories" className="block text-[13px] text-cream/55 no-underline mb-[7px] hover:text-cream transition-colors">
+            Categories
+          </Link>
+          <Link href="/browse/languages" className="block text-[13px] text-cream/55 no-underline mb-[7px] hover:text-cream transition-colors">
+            Languages
+          </Link>
+          <Link href="/browse/countries" className="block text-[13px] text-cream/55 no-underline mb-[7px] hover:text-cream transition-colors">
+            Countries
+          </Link>
+        </div>
+        <div>
+          <div className="text-[10px] font-medium tracking-[0.12em] uppercase text-cream/35 mb-2.5">
             Developers
           </div>
           <Link href="/docs" className="block text-[13px] text-cream/55 no-underline mb-[7px] hover:text-cream transition-colors">

@@ -66,3 +66,36 @@ export interface ContributionPayload {
   contributor_email: string;
   contributor_note: string;
 }
+
+/* ── Browse types ──────────────────────────────────────────────────────────── */
+
+export interface CategorySummary {
+  value: string;
+  label: string;
+  concept_count: number;
+}
+
+export interface LanguageWithCount extends Language {
+  translation_count: number;
+}
+
+export interface CountrySummary {
+  name: string;
+  language_count: number;
+  languages: { code: string; name: string; family: string; translation_count: number }[];
+}
+
+export interface TranslationWithConcept {
+  id: string;
+  word: string;
+  phonetic: string;
+  cultural_note: string;
+  source: string;
+  is_precolonial: boolean;
+  verified: boolean;
+  language: Language;
+  ethnic_group: EthnicGroup | null;
+  concept_slug: string;
+  concept_term: string;
+  concept_category: string;
+}

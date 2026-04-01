@@ -126,9 +126,9 @@ export default function HomeContent() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 max-w-[1000px] mx-auto mb-[60px] px-12 gap-px bg-border border border-border rounded-lg overflow-hidden animate-[fadeUp_0.6s_0.1s_ease_both]">
         {[
-          { num: "40+", label: "Languages" },
-          { num: "500+", label: "Concepts" },
-          { num: "54", label: "Countries" },
+          { num: "20", label: "Languages" },
+          { num: "196", label: "Concepts" },
+          { num: "22", label: "Countries" },
           { num: "100%", label: "Open source" },
         ].map((s) => (
           <div key={s.label} className="bg-cream px-[22px] py-[30px] text-center">

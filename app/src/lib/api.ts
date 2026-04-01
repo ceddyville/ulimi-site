@@ -3,6 +3,10 @@ import type {
   ConceptListItem,
   ContributionPayload,
   PaginatedResponse,
+  CategorySummary,
+  LanguageWithCount,
+  CountrySummary,
+  TranslationWithConcept,
 } from "./types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "https://ulimi.dev/api/v1";
@@ -52,4 +56,28 @@ export function submitContribution(data: ContributionPayload) {
     method: "POST",
     body: JSON.stringify(data),
   });
+}
+
+/* ── Browse endpoints ──────────────────────────────────────────────────────── */
+
+export function listCategories() {
+  return apiFetch<CategorySummary[]>("/concepts/categories/");
+}
+
+export function listLanguages() {
+  return apiFetch<LanguageWithCount[]>("/languages/");
+}
+
+export function getLanguage(code: string) {
+  return apiFetch<LanguageWithCount>(`/languages/${encodeURIComponent(code)}/`);
+}
+
+export function getLanguageTranslations(code: string) {
+  return apiFetch<TranslationWithConcept[]>(
+    `/languages/${encodeURIComponent(code)}/translations/`
+  );
+}
+
+export function listCountries() {
+  return apiFetch<CountrySummary[]>("/languages/countries/");
 }

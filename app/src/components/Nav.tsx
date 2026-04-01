@@ -30,6 +30,9 @@ export default function Nav() {
       </Link>
 
       <div className="flex gap-7 items-center">
+        <Link href="/browse" className="text-ink3 text-[13px] no-underline tracking-[0.02em] hover:text-ink transition-colors">
+          Browse
+        </Link>
         <Link href="/#search" className="text-ink3 text-[13px] no-underline tracking-[0.02em] hover:text-ink transition-colors">
           Dictionary
         </Link>
