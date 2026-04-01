@@ -135,7 +135,7 @@ export default async function LanguageDetailPage({ params }: Props) {
               {items.map((t) => (
                 <Link
                   key={t.id}
-                  href={`/words/${t.concept_slug}`}
+                  href={`/words/${t.concept_slug}?lang=${lang.code}`}
                   className="block px-5 py-4 border-r border-b border-border hover:bg-ochre/[0.03] transition-colors group no-underline"
                 >
                   <div className="font-[family-name:var(--font-cormorant)] text-[24px] font-semibold text-ink group-hover:text-ochre-d transition-colors leading-tight">

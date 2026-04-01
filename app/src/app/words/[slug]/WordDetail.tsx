@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import type { ConceptDetail, ConceptListItem } from "@/lib/types";
+import type { ConceptDetail, ConceptListItem, LanguageWithCount, TranslationWithConcept } from "@/lib/types";
 import { searchConcepts } from "@/lib/api";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
@@ -12,9 +12,11 @@ import ContributeModal from "@/components/ContributeModal";
 interface Props {
   concept: ConceptDetail;
   similarWords: ConceptListItem[];
+  featuredLang?: LanguageWithCount | null;
+  moreInLanguage?: TranslationWithConcept[];
 }
 
-export default function WordDetail({ concept, similarWords }: Props) {
+export default function WordDetail({ concept, similarWords, featuredLang, moreInLanguage = [] }: Props) {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<"new_translation" | "correction">("new_translation");
@@ -25,6 +27,14 @@ export default function WordDetail({ concept, similarWords }: Props) {
     word?: string;
   }>({});
   const [searchQuery, setSearchQuery] = useState("");
+
+  // If a language is featured, find that translation and separate it from the rest
+  const featuredTranslation = featuredLang
+    ? concept.translations.find((t) => t.language.code === featuredLang.code) ?? null
+    : null;
+  const otherTranslations = featuredTranslation
+    ? concept.translations.filter((t) => t.id !== featuredTranslation.id)
+    : concept.translations;
 
   const handleSearch = useCallback(async (q: string) => {
     const trimmed = q.trim();
@@ -64,7 +74,17 @@ export default function WordDetail({ concept, similarWords }: Props) {
         <div className="flex items-center gap-2 text-[12px] text-ink3 mb-5">
           <Link href="/" className="hover:text-ochre-d transition-colors">Dictionary</Link>
           <span className="text-ink3/40">/</span>
-          <span className="text-ink2">{concept.english_term}</span>
+          {featuredLang ? (
+            <>
+              <Link href="/browse/languages" className="hover:text-ochre-d transition-colors">Languages</Link>
+              <span className="text-ink3/40">/</span>
+              <Link href={`/browse/languages/${featuredLang.code}`} className="hover:text-ochre-d transition-colors">{featuredLang.name}</Link>
+              <span className="text-ink3/40">/</span>
+              <span className="text-ink2">{featuredTranslation?.word ?? concept.english_term}</span>
+            </>
+          ) : (
+            <span className="text-ink2">{concept.english_term}</span>
+          )}
         </div>
 
         {/* Search another word */}
@@ -89,23 +109,71 @@ export default function WordDetail({ concept, similarWords }: Props) {
 
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-baseline gap-3 mb-2">
-            <h1 className="font-[family-name:var(--font-cormorant)] text-[42px] font-bold text-ink leading-tight">
-              {concept.english_term}
-            </h1>
-            <Link
-              href={`/browse/categories/${concept.category}`}
-              className="text-[11px] bg-ochre/[0.1] text-ochre-d px-2.5 py-0.5 rounded-[3px] tracking-[0.07em] uppercase font-medium no-underline hover:bg-ochre/[0.2] transition-colors"
-            >
-              {concept.category}
-            </Link>
-          </div>
-          <p className="text-[14px] text-ink3">
-            {concept.translation_count} translation{concept.translation_count !== 1 ? "s" : ""} across African languages
-            {concept.verified && (
-              <span className="ml-2 text-[11px] text-forest font-medium">✓ Verified</span>
-            )}
-          </p>
+          {featuredTranslation ? (
+            <>
+              <div className="flex items-baseline gap-3 mb-1">
+                <h1 className="font-[family-name:var(--font-cormorant)] text-[48px] font-bold text-ink leading-tight">
+                  {featuredTranslation.word}
+                </h1>
+                <Link
+                  href={`/browse/languages/${featuredLang!.code}`}
+                  className="text-[11px] bg-ochre/[0.1] text-ochre-d px-2.5 py-0.5 rounded-[3px] tracking-[0.07em] uppercase font-medium no-underline hover:bg-ochre/[0.2] transition-colors"
+                >
+                  {featuredLang!.name}
+                </Link>
+              </div>
+              {featuredTranslation.phonetic && (
+                <div className="text-[14px] text-ink3 font-[family-name:var(--font-dm-mono)] mb-1">
+                  /{featuredTranslation.phonetic}/
+                </div>
+              )}
+              <p className="text-[16px] text-ink2 mb-1">
+                English: <strong className="font-medium">{concept.english_term}</strong>
+              </p>
+              {featuredTranslation.cultural_note && (
+                <p className="text-[13px] text-ink3 italic">{featuredTranslation.cultural_note}</p>
+              )}
+              {featuredTranslation.ethnic_group && (
+                <p className="text-[12px] text-ink3/70 mt-1">
+                  {featuredTranslation.ethnic_group.name} · {featuredTranslation.ethnic_group.country_iso2}
+                </p>
+              )}
+              <div className="flex items-center gap-3 mt-2">
+                <Link
+                  href={`/browse/categories/${concept.category}`}
+                  className="text-[11px] bg-ochre/[0.1] text-ochre-d px-2.5 py-0.5 rounded-[3px] tracking-[0.07em] uppercase font-medium no-underline hover:bg-ochre/[0.2] transition-colors"
+                >
+                  {concept.category}
+                </Link>
+                <span className="text-[13px] text-ink3">
+                  {concept.translation_count} translation{concept.translation_count !== 1 ? "s" : ""} across African languages
+                </span>
+                {concept.verified && (
+                  <span className="text-[11px] text-forest font-medium">✓ Verified</span>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex items-baseline gap-3 mb-2">
+                <h1 className="font-[family-name:var(--font-cormorant)] text-[42px] font-bold text-ink leading-tight">
+                  {concept.english_term}
+                </h1>
+                <Link
+                  href={`/browse/categories/${concept.category}`}
+                  className="text-[11px] bg-ochre/[0.1] text-ochre-d px-2.5 py-0.5 rounded-[3px] tracking-[0.07em] uppercase font-medium no-underline hover:bg-ochre/[0.2] transition-colors"
+                >
+                  {concept.category}
+                </Link>
+              </div>
+              <p className="text-[14px] text-ink3">
+                {concept.translation_count} translation{concept.translation_count !== 1 ? "s" : ""} across African languages
+                {concept.verified && (
+                  <span className="ml-2 text-[11px] text-forest font-medium">✓ Verified</span>
+                )}
+              </p>
+            </>
+          )}
         </div>
 
         {/* Pre-colonial context */}
@@ -123,13 +191,15 @@ export default function WordDetail({ concept, similarWords }: Props) {
         {/* Translations */}
         <div className="mb-10">
           <h2 className="text-[11px] font-medium text-ink3 tracking-[0.1em] uppercase mb-4">
-            Translations
+            {featuredLang ? "In other languages" : "Translations"}
           </h2>
 
-          {concept.translations.length === 0 ? (
+          {otherTranslations.length === 0 ? (
             <div className="bg-cream border border-border rounded-lg px-6 py-8 text-center">
               <p className="text-ink3 text-[14px] mb-4">
-                No translations yet. Be the first to contribute one.
+                {featuredLang
+                  ? `No other translations yet. Be the first to contribute one.`
+                  : `No translations yet. Be the first to contribute one.`}
               </p>
               <button
                 onClick={openAddTranslation}
@@ -140,7 +210,7 @@ export default function WordDetail({ concept, similarWords }: Props) {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 bg-cream border border-border rounded-lg overflow-hidden">
-              {concept.translations.map((t) => (
+              {otherTranslations.map((t) => (
                 <div
                   key={t.id}
                   className="relative group px-5 py-4 border-r border-b border-border last:border-b-0"
@@ -206,7 +276,38 @@ export default function WordDetail({ concept, similarWords }: Props) {
           </button>
         </div>
 
-        {/* Similar words */}
+        {/* More in [Language] — only when coming from a language page */}
+        {featuredLang && moreInLanguage.length > 0 && (
+          <div className="mt-10">
+            <h2 className="text-[11px] font-medium text-ink3 tracking-[0.1em] uppercase mb-4">
+              More in{" "}
+              <Link
+                href={`/browse/languages/${featuredLang.code}`}
+                className="text-ochre-d no-underline hover:text-ochre transition-colors"
+              >
+                {featuredLang.name}
+              </Link>
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-0 bg-cream border border-border rounded-lg overflow-hidden">
+              {moreInLanguage.map((t) => (
+                <Link
+                  key={t.id}
+                  href={`/words/${t.concept_slug}?lang=${featuredLang.code}`}
+                  className="block px-4 py-3.5 border-r border-b border-border hover:bg-ochre/[0.03] transition-colors group no-underline"
+                >
+                  <div className="font-[family-name:var(--font-cormorant)] text-[20px] font-semibold text-ink group-hover:text-ochre-d transition-colors leading-tight">
+                    {t.word}
+                  </div>
+                  <div className="text-[11px] text-ink3 mt-0.5">
+                    {t.concept_term}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Similar words from same category */}
         {similarWords.length > 0 && (
           <div className="mt-10">
             <h2 className="text-[11px] font-medium text-ink3 tracking-[0.1em] uppercase mb-4">

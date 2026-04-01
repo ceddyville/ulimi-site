@@ -1,11 +1,12 @@
-import { getConcept, listConcepts } from "@/lib/api";
+import { getConcept, listConcepts, getLanguage, getLanguageTranslations } from "@/lib/api";
 import type { Metadata } from "next";
-import type { ConceptListItem } from "@/lib/types";
+import type { ConceptListItem, TranslationWithConcept, LanguageWithCount } from "@/lib/types";
 import Link from "next/link";
 import WordDetail from "./WordDetail";
 
 interface Props {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ lang?: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -21,8 +22,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function WordPage({ params }: Props) {
+export default async function WordPage({ params, searchParams }: Props) {
   const { slug } = await params;
+  const { lang: langCode } = await searchParams;
 
   let concept;
   try {
@@ -57,5 +59,31 @@ export default async function WordPage({ params }: Props) {
     // Non-critical — page still works without similar words
   }
 
-  return <WordDetail concept={concept} similarWords={similarWords} />;
+  // If a language is specified, fetch language info + more words from that language
+  let featuredLang: LanguageWithCount | null = null;
+  let moreInLanguage: TranslationWithConcept[] = [];
+
+  if (langCode) {
+    try {
+      const [langInfo, langTranslations] = await Promise.all([
+        getLanguage(langCode),
+        getLanguageTranslations(langCode),
+      ]);
+      featuredLang = langInfo;
+      moreInLanguage = langTranslations
+        .filter((t) => t.concept_slug !== concept.slug)
+        .slice(0, 8);
+    } catch {
+      // Fall back to default view
+    }
+  }
+
+  return (
+    <WordDetail
+      concept={concept}
+      similarWords={similarWords}
+      featuredLang={featuredLang}
+      moreInLanguage={moreInLanguage}
+    />
+  );
 }
