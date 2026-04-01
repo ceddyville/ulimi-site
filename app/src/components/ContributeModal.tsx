@@ -74,6 +74,7 @@ export default function ContributeModal({ open, onClose, initialType, prefill }:
   const [activeTab, setActiveTab] = useState<ContributionType>(initialType);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
   const [trustError, setTrustError] = useState(false);
 
   // Form fields — new_concept
@@ -124,6 +125,7 @@ export default function ContributeModal({ open, onClose, initialType, prefill }:
     if (open) {
       setActiveTab(initialType);
       setSuccess(false);
+      setError("");
       setTrustError(false);
 
       if (prefill?.conceptTerm && initialType === "new_concept") {
@@ -171,6 +173,7 @@ export default function ContributeModal({ open, onClose, initialType, prefill }:
       return;
     }
     setTrustError(false);
+    setError("");
     setSubmitting(true);
 
     try {
@@ -227,9 +230,12 @@ export default function ContributeModal({ open, onClose, initialType, prefill }:
 
       await submitContribution(payload);
       setSuccess(true);
-    } catch {
-      // Still show success for now — the submission was attempted
-      setSuccess(true);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? "Submission failed. Please check your fields and try again."
+          : "Something went wrong. Please try again."
+      );
     } finally {
       setSubmitting(false);
     }
@@ -521,6 +527,11 @@ export default function ContributeModal({ open, onClose, initialType, prefill }:
             </div>
 
             {/* Footer */}
+            {error && (
+              <div className="mx-6 mb-0 mt-[-8px] bg-red-50 border border-red-200 rounded-md px-3.5 py-2.5 text-[12px] text-red-700 leading-[1.55]">
+                {error}
+              </div>
+            )}
             <div className="px-6 py-3.5 border-t border-border flex items-center justify-between gap-3 bg-bg2 sticky bottom-0">
               <div className="text-[11px] text-ink3 leading-[1.5] max-w-[280px]">
                 All contributions are <strong className="text-ink2 font-medium">reviewed by an admin</strong> before going live. You will be credited when your word is approved.
