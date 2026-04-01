@@ -18,19 +18,36 @@ interface ModalProps {
 }
 
 const LANGUAGES = [
-  { code: "sw", name: "Swahili" },
-  { code: "luo", name: "Luo" },
-  { code: "ki", name: "Kikuyu (Gikuyu)" },
-  { code: "sn", name: "Shona" },
-  { code: "nd", name: "Ndebele" },
-  { code: "zu", name: "Zulu" },
-  { code: "yo", name: "Yoruba" },
-  { code: "ha", name: "Hausa" },
-  { code: "am", name: "Amharic" },
-  { code: "so", name: "Somali" },
-  { code: "tw", name: "Twi (Akan)" },
-  { code: "other", name: "Other" },
+  { code: "af", name: "Afrikaans", regions: ["South Africa", "Namibia"] },
+  { code: "am", name: "Amharic", regions: ["Ethiopia"] },
+  { code: "bxk", name: "Luhya", regions: ["Kenya"] },
+  { code: "ebu", name: "Embu (Kiembu)", regions: ["Kenya"] },
+  { code: "guz", name: "Kisii (Gusii)", regions: ["Kenya"] },
+  { code: "ha", name: "Hausa", regions: ["Nigeria", "Niger", "Ghana", "Chad"] },
+  { code: "hz", name: "Herero", regions: ["Namibia", "Botswana"] },
+  { code: "ki", name: "Kikuyu (Gikuyu)", regions: ["Kenya"] },
+  { code: "luo", name: "Luo", regions: ["Kenya", "Uganda", "Tanzania"] },
+  { code: "mas", name: "Maasai (Maa)", regions: ["Kenya", "Tanzania"] },
+  { code: "nd", name: "Ndebele", regions: ["Zimbabwe", "South Africa"] },
+  { code: "nyf", name: "Mijikenda", regions: ["Kenya"] },
+  { code: "sn", name: "Shona", regions: ["Zimbabwe"] },
+  { code: "so", name: "Somali", regions: ["Somalia", "Ethiopia", "Kenya", "Djibouti"] },
+  { code: "ss", name: "Siswati", regions: ["Eswatini", "South Africa"] },
+  { code: "st", name: "Sotho", regions: ["South Africa", "Lesotho"] },
+  { code: "sw", name: "Swahili", regions: ["Kenya", "Tanzania", "Uganda", "DRC"] },
+  { code: "tn", name: "Tswana (Setswana)", regions: ["Botswana", "South Africa"] },
+  { code: "ts", name: "Shangaan (Tsonga)", regions: ["South Africa", "Mozambique"] },
+  { code: "tw", name: "Twi (Akan)", regions: ["Ghana", "Ivory Coast"] },
+  { code: "ve", name: "Venda", regions: ["South Africa", "Zimbabwe"] },
+  { code: "xh", name: "Xhosa", regions: ["South Africa"] },
+  { code: "yo", name: "Yoruba", regions: ["Nigeria", "Benin", "Togo"] },
+  { code: "zu", name: "Zulu", regions: ["South Africa"] },
+  { code: "other", name: "Other", regions: [] },
 ];
+
+const COUNTRIES = Array.from(
+  new Set(LANGUAGES.flatMap((l) => l.regions))
+).sort();
 
 const CATEGORIES = [
   { value: "animals", label: "Animals" },
@@ -64,6 +81,7 @@ export default function ContributeModal({ open, onClose, initialType, prefill }:
   const [category, setCategory] = useState("");
   const [precolonial, setPrecolonial] = useState("");
   const [word, setWord] = useState("");
+  const [country, setCountry] = useState("");
   const [lang, setLang] = useState("");
   const [langOther, setLangOther] = useState("");
   const [phonetic, setPhonetic] = useState("");
@@ -74,12 +92,21 @@ export default function ContributeModal({ open, onClose, initialType, prefill }:
   // Form fields — new_translation
   const [conceptRef, setConceptRef] = useState("");
   const [word2, setWord2] = useState("");
+  const [country2, setCountry2] = useState("");
   const [lang2, setLang2] = useState("");
   const [langOther2, setLangOther2] = useState("");
   const [phonetic2, setPhonetic2] = useState("");
   const [ethnic2, setEthnic2] = useState("");
   const [culturalNote2, setCulturalNote2] = useState("");
   const [isPrecolonial2, setIsPrecolonial2] = useState(true);
+
+  // Filtered languages based on selected country
+  const filteredLangs = country
+    ? LANGUAGES.filter((l) => l.regions.includes(country) || l.code === "other")
+    : LANGUAGES;
+  const filteredLangs2 = country2
+    ? LANGUAGES.filter((l) => l.regions.includes(country2) || l.code === "other")
+    : LANGUAGES;
 
   // Form fields — correction
   const [correctionField, setCorrectionField] = useState("word");
@@ -321,10 +348,21 @@ export default function ContributeModal({ open, onClose, initialType, prefill }:
                       <input className="w-full bg-bg border border-border rounded px-[13px] py-2.5 text-ink text-[14px] font-[family-name:var(--font-jost)] outline-none transition-colors focus:border-ochre placeholder:text-ink3" placeholder="e.g. Uyombo" value={word} onChange={(e) => setWord(e.target.value)} />
                     </div>
                     <div>
+                      <label className="block text-[10px] font-medium text-ink3 tracking-[0.08em] uppercase mb-[5px]">Country</label>
+                      <select className="w-full bg-bg border border-border rounded px-[13px] py-2.5 text-ink text-[14px] font-[family-name:var(--font-jost)] outline-none cursor-pointer appearance-none transition-colors focus:border-ochre" value={country} onChange={(e) => { setCountry(e.target.value); setLang(""); }}>
+                        <option value="">— all countries —</option>
+                        {COUNTRIES.map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 mb-3.5">
+                    <div>
                       <label className="block text-[10px] font-medium text-ink3 tracking-[0.08em] uppercase mb-[5px]">Language <span className="text-ochre">*</span></label>
                       <select className="w-full bg-bg border border-border rounded px-[13px] py-2.5 text-ink text-[14px] font-[family-name:var(--font-jost)] outline-none cursor-pointer appearance-none transition-colors focus:border-ochre" value={lang} onChange={(e) => setLang(e.target.value)}>
                         <option value="">— select —</option>
-                        {LANGUAGES.map((l) => (
+                        {filteredLangs.map((l) => (
                           <option key={l.code} value={l.code}>{l.name}</option>
                         ))}
                       </select>
@@ -371,10 +409,21 @@ export default function ContributeModal({ open, onClose, initialType, prefill }:
                       <input className="w-full bg-bg border border-border rounded px-[13px] py-2.5 text-ink text-[14px] font-[family-name:var(--font-jost)] outline-none transition-colors focus:border-ochre placeholder:text-ink3" placeholder="The word in your language" value={word2} onChange={(e) => setWord2(e.target.value)} />
                     </div>
                     <div>
+                      <label className="block text-[10px] font-medium text-ink3 tracking-[0.08em] uppercase mb-[5px]">Country</label>
+                      <select className="w-full bg-bg border border-border rounded px-[13px] py-2.5 text-ink text-[14px] font-[family-name:var(--font-jost)] outline-none cursor-pointer appearance-none transition-colors focus:border-ochre" value={country2} onChange={(e) => { setCountry2(e.target.value); setLang2(""); }}>
+                        <option value="">— all countries —</option>
+                        {COUNTRIES.map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 mb-3.5">
+                    <div>
                       <label className="block text-[10px] font-medium text-ink3 tracking-[0.08em] uppercase mb-[5px]">Language <span className="text-ochre">*</span></label>
                       <select className="w-full bg-bg border border-border rounded px-[13px] py-2.5 text-ink text-[14px] font-[family-name:var(--font-jost)] outline-none cursor-pointer appearance-none transition-colors focus:border-ochre" value={lang2} onChange={(e) => setLang2(e.target.value)}>
                         <option value="">— select —</option>
-                        {LANGUAGES.map((l) => (
+                        {filteredLangs2.map((l) => (
                           <option key={l.code} value={l.code}>{l.name}</option>
                         ))}
                       </select>
