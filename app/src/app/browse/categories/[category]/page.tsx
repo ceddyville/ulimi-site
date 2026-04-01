@@ -67,12 +67,12 @@ export default async function CategoryDetailPage({ params }: Props) {
         {label}
       </h1>
       <p className="text-[15px] text-ink3 mb-10 font-light">
-        {concepts.length} concept{concepts.length !== 1 ? "s" : ""}
+        {concepts.length} word{concepts.length !== 1 ? "s" : ""}
       </p>
 
       {concepts.length === 0 ? (
         <div className="bg-cream border border-border rounded-lg px-6 py-10 text-center">
-          <p className="text-ink3 text-[14px]">No concepts found in this category.</p>
+          <p className="text-ink3 text-[14px]">No words found in this category.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 bg-cream border border-border rounded-lg overflow-hidden">

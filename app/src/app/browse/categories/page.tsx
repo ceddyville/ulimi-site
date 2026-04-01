@@ -44,7 +44,7 @@ export default async function CategoriesPage() {
         Categories
       </h1>
       <p className="text-[15px] text-ink3 mb-10 font-light">
-        {categories.length} categories · {categories.reduce((s, c) => s + c.concept_count, 0)} concepts
+        {categories.length} categories · {categories.reduce((s, c) => s + c.concept_count, 0)} words
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -63,7 +63,7 @@ export default async function CategoriesPage() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-[13px] text-ink3">
-                  {cat.concept_count} concept{cat.concept_count !== 1 ? "s" : ""}
+                  {cat.concept_count} word{cat.concept_count !== 1 ? "s" : ""}
                 </span>
                 <span className="text-[11px] text-ochre-d font-medium tracking-[0.06em] uppercase opacity-0 group-hover:opacity-100 transition-opacity">
                   View →

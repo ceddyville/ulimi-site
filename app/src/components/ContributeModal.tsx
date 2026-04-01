@@ -46,7 +46,7 @@ const CATEGORIES = [
 
 const SUCCESS_MESSAGES: Record<ContributionType, string> = {
   new_concept:
-    "Your new concept has been submitted. It\u2019s now pending admin review \u2014 community members can upvote it while it waits.",
+    "Your new word has been submitted. It\u2019s now pending admin review \u2014 community members can upvote it while it waits.",
   new_translation:
     "Your translation has been submitted and will go live after admin approval.",
   correction:
@@ -129,8 +129,8 @@ export default function ContributeModal({ open, onClose, initialType, prefill }:
   const contextMessage = (() => {
     if (activeTab === "new_concept") {
       return prefill?.conceptTerm
-        ? `You\u2019re adding \u201c${prefill.conceptTerm}\u201d as a new concept. Fill in the details and your first translation.`
-        : "Add a new concept to the dictionary with your first translation.";
+        ? `You\u2019re adding \u201c${prefill.conceptTerm}\u201d as a new word. Fill in the details and your first translation.`
+        : "Add a new word to the dictionary with your first translation.";
     }
     if (activeTab === "new_translation") {
       return `Adding a new language translation for \u201c${prefill?.conceptTerm || conceptRef}\u201d.`;
@@ -223,7 +223,7 @@ export default function ContributeModal({ open, onClose, initialType, prefill }:
         <div className="bg-ink px-6 py-[18px] flex items-center justify-between sticky top-0 z-10">
           <span className="font-[family-name:var(--font-cormorant)] text-[21px] font-semibold text-cream">
             {activeTab === "new_concept"
-              ? "Add a new concept"
+              ? "Add a new word"
               : activeTab === "new_translation"
               ? "Add a translation"
               : "Suggest a correction"}
@@ -279,7 +279,7 @@ export default function ContributeModal({ open, onClose, initialType, prefill }:
                         : "text-ink3 border-b-transparent"
                     }`}
                   >
-                    {t === "new_concept" ? "New concept" : t === "new_translation" ? "Add translation" : "Correction"}
+                    {t === "new_concept" ? "New word" : t === "new_translation" ? "Add translation" : "Correction"}
                   </button>
                 ))}
               </div>
@@ -314,7 +314,7 @@ export default function ContributeModal({ open, onClose, initialType, prefill }:
                     </div>
                   </div>
                   <div className="h-px bg-border my-[18px]" />
-                  <div className="text-[10px] font-medium text-ink3 tracking-[0.08em] uppercase mb-3">Your translation for this concept</div>
+                  <div className="text-[10px] font-medium text-ink3 tracking-[0.08em] uppercase mb-3">Your translation for this word</div>
                   <div className="grid grid-cols-2 gap-3 mb-3.5">
                     <div>
                       <label className="block text-[10px] font-medium text-ink3 tracking-[0.08em] uppercase mb-[5px]">Word <span className="text-ochre">*</span></label>
@@ -362,8 +362,8 @@ export default function ContributeModal({ open, onClose, initialType, prefill }:
               {activeTab === "new_translation" && (
                 <div>
                   <div className="mb-3.5">
-                    <label className="block text-[10px] font-medium text-ink3 tracking-[0.08em] uppercase mb-[5px]">Concept</label>
-                    <input className="w-full bg-bg border border-border rounded px-[13px] py-2.5 text-ink text-[14px] font-[family-name:var(--font-jost)] outline-none transition-colors focus:border-ochre placeholder:text-ink3" placeholder="Which concept are you translating?" value={conceptRef} onChange={(e) => setConceptRef(e.target.value)} />
+                    <label className="block text-[10px] font-medium text-ink3 tracking-[0.08em] uppercase mb-[5px]">Word (English)</label>
+                    <input className="w-full bg-bg border border-border rounded px-[13px] py-2.5 text-ink text-[14px] font-[family-name:var(--font-jost)] outline-none transition-colors focus:border-ochre placeholder:text-ink3" placeholder="Which word are you translating?" value={conceptRef} onChange={(e) => setConceptRef(e.target.value)} />
                   </div>
                   <div className="grid grid-cols-2 gap-3 mb-3.5">
                     <div>

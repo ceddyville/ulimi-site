@@ -127,7 +127,7 @@ export default function HomeContent() {
       <div className="grid grid-cols-2 md:grid-cols-4 max-w-[1000px] mx-auto mb-[60px] px-12 gap-px bg-border border border-border rounded-lg overflow-hidden animate-[fadeUp_0.6s_0.1s_ease_both]">
         {[
           { num: "20", label: "Languages" },
-          { num: "196", label: "Concepts" },
+          { num: "196", label: "Words" },
           { num: "22", label: "Countries" },
           { num: "100%", label: "Open source" },
         ].map((s) => (
@@ -167,7 +167,7 @@ export default function HomeContent() {
       {/* Features */}
       <section className="max-w-[1000px] mx-auto mb-[60px] px-12 grid grid-cols-1 md:grid-cols-2 gap-px bg-border border border-border rounded-[10px] overflow-hidden">
         {[
-          { num: "01", title: "Bidirectional search", desc: "Search \u201clion\u201d or search \u201csimba\u201d \u2014 either direction returns the same concept with all its translations across every language in the database." },
+          { num: "01", title: "Bidirectional search", desc: "Search \u201clion\u201d or search \u201csimba\u201d \u2014 either direction returns the same word with all its translations across every language in the database." },
           { num: "02", title: "Pre-colonial context", desc: "Every entry carries the story of what a word meant before colonisation \u2014 recovering the names and meanings that existed long before European naming systems arrived.", accent: true },
           { num: "03", title: "Community contributed", desc: "Native speakers, scholars, and elders submit words and corrections. Every contribution goes through admin review before going live. The dictionary grows with the community." },
           { num: "04", title: "Kabila API linked", desc: "Each translation connects to its ethnic group \u2014 linking language to clan, kingdom, and cultural lineage across the continent." },

@@ -34,7 +34,7 @@ export default async function WordPage({ params }: Props) {
           Word not found
         </h1>
         <p className="text-ink3 text-sm mb-6">
-          The concept &ldquo;{slug}&rdquo; doesn&apos;t exist in the dictionary yet.
+          The word &ldquo;{slug}&rdquo; doesn&apos;t exist in the dictionary yet.
         </p>
         <Link
           href="/"
