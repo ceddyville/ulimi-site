@@ -30,6 +30,7 @@ export interface ConceptListItem {
   id: string;
   slug: string;
   english_term: string;
+  definition: string;
   category: string;
   translation_count: number;
   verified: boolean;
@@ -39,6 +40,7 @@ export interface ConceptDetail {
   id: string;
   slug: string;
   english_term: string;
+  definition: string;
   category: string;
   precolonial_context: string;
   verified: boolean;

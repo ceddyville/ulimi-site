@@ -142,6 +142,9 @@ export default function WordDetail({ concept, similarWords, featuredLang, moreIn
               )}
               <p className="text-[16px] text-ink2 mb-1">
                 English: <strong className="font-medium">{concept.english_term}</strong>
+                {concept.definition && (
+                  <span className="text-ink3"> — {concept.definition}</span>
+                )}
               </p>
               {featuredTranslation.cultural_note && (
                 <p className="text-[13px] text-ink3 italic">{featuredTranslation.cultural_note}</p>
@@ -179,6 +182,9 @@ export default function WordDetail({ concept, similarWords, featuredLang, moreIn
                   {concept.category}
                 </Link>
               </div>
+              {concept.definition && (
+                <p className="text-[14px] text-ink2 mb-1">{concept.definition}</p>
+              )}
               <p className="text-[14px] text-ink3">
                 {concept.translation_count} translation{concept.translation_count !== 1 ? "s" : ""} across African languages
                 {concept.verified && (
