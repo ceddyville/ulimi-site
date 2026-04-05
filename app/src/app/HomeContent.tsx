@@ -11,7 +11,7 @@ import ResultCard from "@/components/ResultCard";
 import NoResult from "@/components/NoResult";
 import ContributeModal from "@/components/ContributeModal";
 
-export default function HomeContent() {
+export default function HomeContent({ stats }: { stats: { languages: number; words: number; countries: number } }) {
   const searchParams = useSearchParams();
   const qParam = searchParams.get("q") ?? "";
 
@@ -126,9 +126,9 @@ export default function HomeContent() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 max-w-[1000px] mx-auto mb-[60px] px-12 gap-px bg-border border border-border rounded-lg overflow-hidden animate-[fadeUp_0.6s_0.1s_ease_both]">
         {[
-          { num: "24", label: "Languages", href: "/browse/languages" },
-          { num: "380", label: "Words", href: "/browse/categories" },
-          { num: "22", label: "Countries", href: "/browse/countries" },
+          { num: String(stats.languages), label: "Languages", href: "/browse/languages" },
+          { num: String(stats.words), label: "Words", href: "/browse/categories" },
+          { num: String(stats.countries), label: "Countries", href: "/browse/countries" },
           { num: "100%", label: "Open source", href: "https://github.com/ceddyville/ulimi-api" },
         ].map((s) => (
           <a key={s.label} href={s.href} className="bg-cream px-[22px] py-[30px] text-center no-underline hover:bg-ochre/[0.04] transition-colors group">

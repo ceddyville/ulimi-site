@@ -13,6 +13,14 @@ const CATEGORY_LABELS: Record<string, string> = {
   spiritual: "Spiritual & Ceremonial",
   tools: "Tools & Technology",
   geography: "Geography & Place",
+  time: "Time & Seasons",
+  money: "Money & Trade",
+  clothing: "Clothing & Appearance",
+  emotions: "Emotions & Feelings",
+  colors: "Colors & Patterns",
+  numbers: "Numbers & Counting",
+  actions: "Actions & Verbs",
+  measurement: "Measurement & Size",
   other: "Other",
 };
 

@@ -19,6 +19,14 @@ const CATEGORY_LABELS: Record<string, string> = {
   spiritual: "Spiritual & Ceremonial",
   tools: "Tools & Technology",
   geography: "Geography & Place",
+  time: "Time & Seasons",
+  money: "Money & Trade",
+  clothing: "Clothing & Appearance",
+  emotions: "Emotions & Feelings",
+  colors: "Colors & Patterns",
+  numbers: "Numbers & Counting",
+  actions: "Actions & Verbs",
+  measurement: "Measurement & Size",
   other: "Other",
 };
 
@@ -27,9 +35,10 @@ interface Props {
   similarWords: ConceptListItem[];
   featuredLang?: LanguageWithCount | null;
   moreInLanguage?: TranslationWithConcept[];
+  otherMeanings?: ConceptDetail[];
 }
 
-export default function WordDetail({ concept, similarWords, featuredLang, moreInLanguage = [] }: Props) {
+export default function WordDetail({ concept, similarWords, featuredLang, moreInLanguage = [], otherMeanings = [] }: Props) {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<"new_translation" | "correction">("new_translation");
@@ -230,17 +239,17 @@ export default function WordDetail({ concept, similarWords, featuredLang, moreIn
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 bg-cream border border-border rounded-lg overflow-hidden">
               {otherTranslations.map((t) => (
-                <div
+                <Link
                   key={t.id}
-                  className="relative group px-5 py-4 border-r border-b border-border last:border-b-0"
+                  href={`/words/${concept.slug}?lang=${t.language.code}`}
+                  className="relative group block px-5 py-4 border-r border-b border-border last:border-b-0 no-underline hover:bg-ochre/[0.03] transition-colors"
                 >
                   <div className="flex items-center gap-2 mb-1.5">
-                    <Link
-                      href={`/browse/languages/${t.language.code}`}
-                      className="text-[10px] font-medium text-ink3 tracking-[0.08em] uppercase no-underline hover:text-ochre-d transition-colors"
+                    <span
+                      className="text-[10px] font-medium text-ink3 tracking-[0.08em] uppercase"
                     >
                       {t.language.name}
-                    </Link>
+                    </span>
                     {t.is_precolonial && (
                       <span className="text-[9px] bg-forest/[0.08] text-forest px-1.5 py-px rounded tracking-[0.05em]">
                         pre-colonial
@@ -248,7 +257,7 @@ export default function WordDetail({ concept, similarWords, featuredLang, moreIn
                     )}
                   </div>
 
-                  <div className="font-[family-name:var(--font-cormorant)] text-[26px] font-semibold text-ink leading-tight">
+                  <div className="font-[family-name:var(--font-cormorant)] text-[26px] font-semibold text-ink group-hover:text-ochre-d transition-colors leading-tight">
                     {t.word}
                   </div>
 
@@ -271,12 +280,12 @@ export default function WordDetail({ concept, similarWords, featuredLang, moreIn
                   )}
 
                   <button
-                    onClick={() => openCorrection(t.language.name, t.word)}
+                    onClick={(e) => { e.preventDefault(); openCorrection(t.language.name, t.word); }}
                     className="absolute top-3 right-3 text-[10px] text-ink3 bg-bg2 border border-border rounded-[3px] px-[7px] py-0.5 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity font-[family-name:var(--font-jost)] hover:text-ochre-d hover:border-border2"
                   >
                     Correct
                   </button>
-                </div>
+                </Link>
               ))}
             </div>
           )}
@@ -294,6 +303,44 @@ export default function WordDetail({ concept, similarWords, featuredLang, moreIn
             + Add translation
           </button>
         </div>
+
+        {/* Other meanings — when the same word means something else */}
+        {featuredTranslation && otherMeanings.length > 0 && (
+          <div className="mt-10">
+            <h2 className="text-[11px] font-medium text-ink3 tracking-[0.1em] uppercase mb-4">
+              Other meanings of &ldquo;{featuredTranslation.word}&rdquo;
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 bg-cream border border-border rounded-lg overflow-hidden">
+              {otherMeanings.map((c) => {
+                const matchingTranslation = c.translations.find(
+                  (t) => t.language.code === featuredLang!.code
+                );
+                return (
+                  <Link
+                    key={c.id}
+                    href={`/words/${c.slug}?lang=${featuredLang!.code}`}
+                    className="block px-5 py-4 border-r border-b border-border hover:bg-ochre/[0.03] transition-colors group no-underline"
+                  >
+                    <div className="font-[family-name:var(--font-cormorant)] text-[24px] font-semibold text-ink group-hover:text-ochre-d transition-colors leading-tight">
+                      {c.english_term}
+                    </div>
+                    {c.definition && (
+                      <div className="text-[11px] text-ink3 mt-0.5 italic">{c.definition}</div>
+                    )}
+                    {matchingTranslation?.phonetic && (
+                      <div className="text-[11px] text-ink3 mt-1 font-[family-name:var(--font-dm-mono)]">
+                        /{matchingTranslation.phonetic}/
+                      </div>
+                    )}
+                    <div className="text-[10px] text-ink3/70 mt-1.5">
+                      {CATEGORY_LABELS[c.category] ?? c.category}
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* More in [Language] — only when coming from a language page */}
         {featuredLang && moreInLanguage.length > 0 && (

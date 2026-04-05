@@ -64,6 +64,14 @@ export function searchConcepts(q: string, category?: string) {
   );
 }
 
+export function getOtherMeanings(slug: string, word: string, langCode?: string) {
+  const sp = new URLSearchParams({ word });
+  if (langCode) sp.set("lang", langCode);
+  return apiFetch<ConceptDetail[]>(
+    `/concepts/${encodeURIComponent(slug)}/other-meanings/?${sp.toString()}`
+  );
+}
+
 export function submitContribution(data: ContributionPayload) {
   return apiFetch<Record<string, unknown>>("/contributions/", {
     method: "POST",

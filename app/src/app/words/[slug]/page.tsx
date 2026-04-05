@@ -1,6 +1,6 @@
-import { getConcept, listConcepts, getLanguage, getLanguageTranslations } from "@/lib/api";
+import { getConcept, listConcepts, getLanguage, getLanguageTranslations, getOtherMeanings } from "@/lib/api";
 import type { Metadata } from "next";
-import type { ConceptListItem, TranslationWithConcept, LanguageWithCount } from "@/lib/types";
+import type { ConceptDetail, ConceptListItem, TranslationWithConcept, LanguageWithCount } from "@/lib/types";
 import Link from "next/link";
 import WordDetail from "./WordDetail";
 
@@ -62,6 +62,7 @@ export default async function WordPage({ params, searchParams }: Props) {
   // If a language is specified, fetch language info + more words from that language
   let featuredLang: LanguageWithCount | null = null;
   let moreInLanguage: TranslationWithConcept[] = [];
+  let otherMeanings: ConceptDetail[] = [];
 
   if (langCode) {
     try {
@@ -73,6 +74,22 @@ export default async function WordPage({ params, searchParams }: Props) {
       moreInLanguage = langTranslations
         .filter((t) => t.concept_slug !== concept.slug && t.concept_category === concept.category)
         .slice(0, 8);
+
+      // Find the featured translation to look up other meanings
+      const featuredTranslation = concept.translations.find(
+        (t) => t.language.code === langCode
+      );
+      if (featuredTranslation) {
+        try {
+          otherMeanings = await getOtherMeanings(
+            concept.slug,
+            featuredTranslation.word,
+            langCode
+          );
+        } catch {
+          // Non-critical
+        }
+      }
     } catch {
       // Fall back to default view
     }
@@ -84,6 +101,7 @@ export default async function WordPage({ params, searchParams }: Props) {
       similarWords={similarWords}
       featuredLang={featuredLang}
       moreInLanguage={moreInLanguage}
+      otherMeanings={otherMeanings}
     />
   );
 }

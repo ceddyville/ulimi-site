@@ -23,10 +23,16 @@ The dev server runs at `http://localhost:3000` and expects the API at `http://12
 
 ## Pages
 
-| Route   | Description                                                   |
-| ------- | ------------------------------------------------------------- |
-| `/`     | Dictionary homepage — hero, search, results, contribute modal |
-| `/docs` | API documentation with endpoint reference                     |
+| Route                           | Description                                                  |
+| ------------------------------- | ------------------------------------------------------------ |
+| `/`                             | Dictionary homepage — hero, live stats, search, contribute   |
+| `/words/[slug]`                 | Word detail — translations, other meanings, related words    |
+| `/browse/languages`             | All languages                                                |
+| `/browse/languages/[code]`      | Language detail — words grouped by category, subtribe filter |
+| `/browse/categories`            | All categories                                               |
+| `/browse/categories/[category]` | Category detail — all words in a category                    |
+| `/browse/countries`             | Countries with their languages                               |
+| `/docs`                         | API documentation with endpoint reference                    |
 
 ## Project structure
 
@@ -34,8 +40,18 @@ The dev server runs at `http://localhost:3000` and expects the API at `http://12
 app/
   src/
     app/
-      page.tsx              Main dictionary page
+      page.tsx              Main dictionary page (fetches live stats)
+      HomeContent.tsx        Homepage client component (search, results, contribute modal)
       globals.css           Earth-tone design tokens + Tailwind config
+      words/[slug]/
+        page.tsx            Word detail server component (other meanings)
+        WordDetail.tsx      Word detail client component
+      browse/
+        languages/[code]/
+          page.tsx          Language detail server component
+          LanguageDetail.tsx Language detail client component (subtribe filter)
+        categories/[category]/
+          page.tsx          Category detail
       docs/
         page.tsx            Docs page
         docs.css            Dark-green design tokens
@@ -48,7 +64,7 @@ app/
       NoResult.tsx          Empty state with contribute CTA
       ContributeModal.tsx   3-tab contribution form (new concept / translation / correction)
     lib/
-      api.ts                Typed API client (listConcepts, searchConcepts, submitContribution, etc.)
+      api.ts                Typed API client (listConcepts, searchConcepts, getOtherMeanings, etc.)
       types.ts              TypeScript interfaces (Language, Concept, Translation, Contribution)
 ```
 
