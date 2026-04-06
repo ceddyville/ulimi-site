@@ -15,16 +15,21 @@ if (!API_BASE) {
 }
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
+  const url = `${API_BASE}${path}`;
+  const res = await fetch(url, {
     ...init,
+    cache: "no-store",
     headers: {
-      "Content-Type": "application/json",
+      Accept: "application/json",
+      ...(init?.method && init.method !== "GET"
+        ? { "Content-Type": "application/json" }
+        : {}),
       ...init?.headers,
     },
   });
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`API ${res.status}: ${body}`);
+    throw new Error(`API ${res.status} ${url}: ${body.slice(0, 200)}`);
   }
   return res.json() as Promise<T>;
 }

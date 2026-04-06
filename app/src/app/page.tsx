@@ -15,7 +15,8 @@ export default async function HomePage() {
       words: concepts.count,
       countries: countries.length,
     };
-  } catch {
+  } catch (e) {
+    console.error("Homepage stats fetch failed:", e);
     // Fall back to zeros — page still works
   }
 
