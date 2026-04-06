@@ -9,7 +9,10 @@ import type {
   TranslationWithConcept,
 } from "./types";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "https://ulimi.dev/api/v1";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+if (!API_BASE) {
+  throw new Error("NEXT_PUBLIC_API_URL environment variable is required");
+}
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
