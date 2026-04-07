@@ -15,10 +15,10 @@ if (!SERVER_API_BASE) {
 }
 
 // On the server (SSR), call the backend directly.
-// In the browser, use the /proxy rewrite to avoid mixed-content (https→http) blocks.
+// In the browser, use the /api/proxy route to avoid mixed-content (https→http) blocks.
 function getApiBase() {
   if (typeof window === "undefined") return SERVER_API_BASE;
-  return "/proxy/api/v1";
+  return "/api/proxy";
 }
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
