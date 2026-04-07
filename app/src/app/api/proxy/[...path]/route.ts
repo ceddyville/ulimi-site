@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const API_ORIGIN = process.env.API_ORIGIN ?? "http://178.104.133.115";
+const API_ORIGIN = process.env.API_ORIGIN ?? "https://api.ulimi.dev";
 
 export async function GET(
   request: NextRequest,
