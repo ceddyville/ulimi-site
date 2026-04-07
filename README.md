@@ -8,7 +8,8 @@ Frontend for [ulimi.dev](https://ulimi.dev) — The African Tongue.
 - **Tailwind CSS 4**
 - Two design systems:
   - **Dictionary** (earth tones, Cormorant Garamond + Jost) — homepage, search, contribute
-  - **Docs** (dark green, Playfair Display + DM Mono) — API documentation
+  - **Docs** (warm charcoal & ochre, Playfair Display + DM Mono) — API documentation
+- Deployed on **Vercel** (auto-deploy from `main`)
 
 ## Setup
 
@@ -26,6 +27,7 @@ The dev server runs at `http://localhost:3000` and expects the API at `http://12
 | Route                           | Description                                                  |
 | ------------------------------- | ------------------------------------------------------------ |
 | `/`                             | Dictionary homepage — hero, live stats, search, contribute   |
+| `/search?q=...`                 | Search results — auto-redirects on single match              |
 | `/words/[slug]`                 | Word detail — translations, other meanings, related words    |
 | `/browse/languages`             | All languages                                                |
 | `/browse/languages/[code]`      | Language detail — words grouped by category, subtribe filter |
@@ -41,8 +43,11 @@ app/
   src/
     app/
       page.tsx              Main dictionary page (fetches live stats)
-      HomeContent.tsx        Homepage client component (search, results, contribute modal)
+      HomeContent.tsx        Homepage client component (hero, stats, contribute modal)
       globals.css           Earth-tone design tokens + Tailwind config
+      search/
+        page.tsx            Search results server component (redirects on single match)
+        SearchResults.tsx    Search results client component
       words/[slug]/
         page.tsx            Word detail server component (other meanings)
         WordDetail.tsx      Word detail client component
@@ -54,7 +59,7 @@ app/
           page.tsx          Category detail
       docs/
         page.tsx            Docs page
-        docs.css            Dark-green design tokens
+        docs.css            Warm charcoal & ochre design tokens
         DocsContent.tsx     Docs client component (sidebar + endpoint cards)
     components/
       Nav.tsx               Navigation bar
@@ -70,7 +75,9 @@ app/
 
 ## API
 
-Connects to [ulimi-api](https://github.com/ceddyville/ulimi-api) at `ulimi.dev/api/v1/`.
+Server components call `https://api.ulimi.dev/api/v1/` directly. Browser requests go through a Next.js API proxy route (`/api/proxy/[...path]`) to avoid CORS and mixed-content issues.
+
+Connects to [ulimi-api](https://github.com/ceddyville/ulimi-api).
 
 ## License
 
