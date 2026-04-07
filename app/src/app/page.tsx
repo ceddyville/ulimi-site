@@ -1,5 +1,6 @@
 import HomeContent from "./HomeContent";
 import { listConcepts, listLanguages, listCountries } from "@/lib/api";
+import { REGION_NAMES } from "@/lib/regions";
 
 export default async function HomePage() {
   let stats = { languages: 0, words: 0, countries: 0 };
@@ -12,7 +13,7 @@ export default async function HomePage() {
     stats = {
       languages: languages.length,
       words: concepts.count,
-      countries: countries.length,
+      countries: countries.filter((c) => !REGION_NAMES.has(c.name)).length,
     };
   } catch (e) {
     console.error("Homepage stats fetch failed:", e);
