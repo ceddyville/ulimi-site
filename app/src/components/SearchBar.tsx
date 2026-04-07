@@ -1,18 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface SearchBarProps {
-  onSearch: (query: string) => void;
   defaultValue?: string;
 }
 
-export default function SearchBar({ onSearch, defaultValue = "" }: SearchBarProps) {
+export default function SearchBar({ defaultValue = "" }: SearchBarProps) {
   const [query, setQuery] = useState(defaultValue);
+  const router = useRouter();
 
   const handleSubmit = () => {
     const trimmed = query.trim();
-    if (trimmed) onSearch(trimmed);
+    if (trimmed) router.push(`/search?q=${encodeURIComponent(trimmed)}`);
   };
 
   return (

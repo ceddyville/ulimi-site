@@ -22,8 +22,8 @@ export interface Translation {
   source: string;
   is_precolonial: boolean;
   verified: boolean;
-  language: Language;
-  ethnic_group: EthnicGroup | null;
+  languages: Language[];
+  ethnic_groups: EthnicGroup[];
 }
 
 export interface ConceptListItem {
@@ -95,8 +95,8 @@ export interface TranslationWithConcept {
   source: string;
   is_precolonial: boolean;
   verified: boolean;
-  language: Language;
-  ethnic_group: EthnicGroup | null;
+  languages: Language[];
+  ethnic_groups: EthnicGroup[];
   concept_slug: string;
   concept_term: string;
   concept_category: string;

@@ -37,16 +37,18 @@ export default function LanguageDetail({ lang, translations }: Props) {
   const subtribes: EthnicGroup[] = [];
   const seen = new Set<string>();
   for (const t of translations) {
-    if (t.ethnic_group && !seen.has(t.ethnic_group.id)) {
-      seen.add(t.ethnic_group.id);
-      subtribes.push(t.ethnic_group);
+    for (const eg of t.ethnic_groups) {
+      if (!seen.has(eg.id)) {
+        seen.add(eg.id);
+        subtribes.push(eg);
+      }
     }
   }
   subtribes.sort((a, b) => a.name.localeCompare(b.name));
 
   // Filter translations by selected subtribe
   const filtered = activeSubtribe
-    ? translations.filter((t) => t.ethnic_group?.id === activeSubtribe)
+    ? translations.filter((t) => t.ethnic_groups.some(eg => eg.id === activeSubtribe))
     : translations;
 
   // Group filtered translations by category
@@ -60,10 +62,10 @@ export default function LanguageDetail({ lang, translations }: Props) {
   // Count translations per subtribe for the badges
   const subtribeCounts = new Map<string, number>();
   for (const t of translations) {
-    if (t.ethnic_group) {
+    for (const eg of t.ethnic_groups) {
       subtribeCounts.set(
-        t.ethnic_group.id,
-        (subtribeCounts.get(t.ethnic_group.id) ?? 0) + 1
+        eg.id,
+        (subtribeCounts.get(eg.id) ?? 0) + 1
       );
     }
   }
@@ -175,9 +177,9 @@ export default function LanguageDetail({ lang, translations }: Props) {
                   <div className="text-[12px] text-ink3 mt-1">
                     {t.concept_term}
                   </div>
-                  {t.ethnic_group && (
+                  {t.ethnic_groups.length > 0 && (
                     <div className="text-[10px] text-ink3/60 mt-1">
-                      {t.ethnic_group.name}
+                      {t.ethnic_groups.map(eg => eg.name).join(", ")}
                     </div>
                   )}
                 </Link>

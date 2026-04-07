@@ -1,25 +1,13 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
-import type { ConceptDetail, ContributionType } from "@/lib/types";
-import { searchConcepts } from "@/lib/api";
+import { useState, useCallback } from "react";
+import type { ContributionType } from "@/lib/types";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import SearchBar from "@/components/SearchBar";
-import ResultCard from "@/components/ResultCard";
-import NoResult from "@/components/NoResult";
 import ContributeModal from "@/components/ContributeModal";
 
 export default function HomeContent({ stats }: { stats: { languages: number; words: number; countries: number } }) {
-  const searchParams = useSearchParams();
-  const qParam = searchParams.get("q") ?? "";
-
-  const [results, setResults] = useState<ConceptDetail[]>([]);
-  const [lastQuery, setLastQuery] = useState("");
-  const [searched, setSearched] = useState(false);
-  const [loading, setLoading] = useState(false);
-
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<ContributionType>("new_concept");
@@ -30,25 +18,6 @@ export default function HomeContent({ stats }: { stats: { languages: number; wor
     word?: string;
     translationId?: string;
   }>({});
-
-  const handleSearch = useCallback(async (query: string) => {
-    setLastQuery(query);
-    setSearched(true);
-    setLoading(true);
-    try {
-      const data = await searchConcepts(query);
-      setResults(data);
-    } catch {
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Auto-search when ?q= param is present (e.g. from detail page search)
-  useEffect(() => {
-    if (qParam) handleSearch(qParam);
-  }, [qParam, handleSearch]);
 
   const openModal = useCallback(
     (type: ContributionType, prefill: typeof modalPrefill = {}) => {
@@ -86,7 +55,7 @@ export default function HomeContent({ stats }: { stats: { languages: number; wor
               Explore the dictionary
             </a>
             <a href="/docs" className="bg-transparent text-ink2 px-5 py-[13px] rounded text-[12px] no-underline border border-border2 font-[family-name:var(--font-dm-mono)] transition-all hover:border-ochre hover:text-ochre-d">
-              ulimi.dev/api/v1/
+              API Docs
             </a>
           </div>
         </div>
@@ -145,23 +114,8 @@ export default function HomeContent({ stats }: { stats: { languages: number; wor
           Search in English or any African language — simba, ubuntu, mama, mvua, ibhubesi…
         </div>
         <div className="mb-6">
-          <SearchBar onSearch={handleSearch} defaultValue={qParam || "lion"} />
+          <SearchBar />
         </div>
-
-        {loading && (
-          <div className="text-center py-8 text-ink3 text-[14px]">Searching…</div>
-        )}
-
-        {!loading && searched && results.length === 0 && (
-          <NoResult query={lastQuery} onAddConcept={(term) => openModal("new_concept", { conceptTerm: term })} />
-        )}
-
-        {!loading &&
-          results.map((concept) => (
-            <div key={concept.id} className="mb-4">
-              <ResultCard concept={concept} />
-            </div>
-          ))}
       </section>
 
       {/* Features */}

@@ -4,9 +4,9 @@ import Link from "next/link";
 
 const DocsLogo = () => (
   <svg width="16" height="16" viewBox="0 0 20 20">
-    <ellipse cx="10" cy="10" rx="7" ry="4.5" fill="none" stroke="#3DBD8F" strokeWidth="1.5" />
-    <path d="M10 5.5 Q14.5 7.5 14.5 10 Q14.5 12.5 10 14.5" fill="none" stroke="#3DBD8F" strokeWidth="1.5" strokeLinecap="round" />
-    <circle cx="12.5" cy="10" r="1.5" fill="#3DBD8F" />
+    <ellipse cx="10" cy="10" rx="7" ry="4.5" fill="none" stroke="#c8873a" strokeWidth="1.5" />
+    <path d="M10 5.5 Q14.5 7.5 14.5 10 Q14.5 12.5 10 14.5" fill="none" stroke="#c8873a" strokeWidth="1.5" strokeLinecap="round" />
+    <circle cx="12.5" cy="10" r="1.5" fill="#c8873a" />
   </svg>
 );
 
@@ -69,10 +69,12 @@ export default function DocsContent() {
       {/* Header */}
       <header className="doc-header">
         <div className="doc-header-left">
-          <div className="doc-header-mark">
-            <DocsLogo />
-          </div>
-          <span className="doc-header-name">ulimi</span>
+          <Link href="/" className="doc-header-home">
+            <div className="doc-header-mark">
+              <DocsLogo />
+            </div>
+            <span className="doc-header-name">ulimi</span>
+          </Link>
           <span className="doc-header-badge">API Docs</span>
         </div>
         <div className="doc-header-right">

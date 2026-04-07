@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import Link from "next/link";
-import type { ConceptDetail, ConceptListItem, LanguageWithCount, TranslationWithConcept } from "@/lib/types";
-import { searchConcepts } from "@/lib/api";
+import type { ConceptDetail, ConceptListItem, ContributionType, LanguageWithCount, TranslationWithConcept } from "@/lib/types";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import SearchBar from "@/components/SearchBar";
 import ContributeModal from "@/components/ContributeModal";
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -35,45 +34,25 @@ interface Props {
   similarWords: ConceptListItem[];
   featuredLang?: LanguageWithCount | null;
   moreInLanguage?: TranslationWithConcept[];
-  otherMeanings?: ConceptDetail[];
+  otherMeaningsMap?: Record<string, ConceptDetail[]>;
 }
 
-export default function WordDetail({ concept, similarWords, featuredLang, moreInLanguage = [], otherMeanings = [] }: Props) {
-  const router = useRouter();
+export default function WordDetail({ concept, similarWords, featuredLang, moreInLanguage = [], otherMeaningsMap = {} }: Props) {
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<"new_translation" | "correction">("new_translation");
+  const [modalType, setModalType] = useState<ContributionType>("new_translation");
   const [prefill, setPrefill] = useState<{
     conceptTerm?: string;
     conceptId?: string;
     langName?: string;
     word?: string;
   }>({});
-  const [searchQuery, setSearchQuery] = useState("");
-
   // If a language is featured, find that translation and separate it from the rest
   const featuredTranslation = featuredLang
-    ? concept.translations.find((t) => t.language.code === featuredLang.code) ?? null
+    ? concept.translations.find((t) => t.languages.some(l => l.code === featuredLang.code)) ?? null
     : null;
   const otherTranslations = featuredTranslation
     ? concept.translations.filter((t) => t.id !== featuredTranslation.id)
     : concept.translations;
-
-  const handleSearch = useCallback(async (q: string) => {
-    const trimmed = q.trim();
-    if (!trimmed) return;
-    try {
-      const results = await searchConcepts(trimmed);
-      if (results.length === 1) {
-        router.push(`/words/${results[0].slug}`);
-      } else if (results.length > 1) {
-        router.push(`/?q=${encodeURIComponent(trimmed)}#search`);
-      } else {
-        router.push(`/?q=${encodeURIComponent(trimmed)}#search`);
-      }
-    } catch {
-      router.push(`/?q=${encodeURIComponent(trimmed)}#search`);
-    }
-  }, [router]);
 
   function openAddTranslation() {
     setModalType("new_translation");
@@ -110,23 +89,8 @@ export default function WordDetail({ concept, similarWords, featuredLang, moreIn
         </div>
 
         {/* Search another word */}
-        <div className="flex gap-2.5 mb-8">
-          <input
-            type="text"
-            className="flex-1 bg-cream border border-border rounded px-[18px] py-[11px] text-ink text-[14px] font-[family-name:var(--font-jost)] outline-none transition-colors focus:border-ochre placeholder:text-ink3"
-            placeholder="Search another word — simba, ubuntu, mama…"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleSearch(searchQuery);
-            }}
-          />
-          <button
-            onClick={() => handleSearch(searchQuery)}
-            className="bg-ink text-cream px-5 py-[11px] rounded text-[12px] font-medium tracking-[0.06em] uppercase cursor-pointer font-[family-name:var(--font-jost)] transition-colors hover:bg-ochre-d"
-          >
-            Search
-          </button>
+        <div className="mb-8">
+          <SearchBar />
         </div>
 
         {/* Header */}
@@ -158,9 +122,9 @@ export default function WordDetail({ concept, similarWords, featuredLang, moreIn
               {featuredTranslation.cultural_note && (
                 <p className="text-[13px] text-ink3 italic">{featuredTranslation.cultural_note}</p>
               )}
-              {featuredTranslation.ethnic_group && (
+              {featuredTranslation.ethnic_groups.length > 0 && (
                 <p className="text-[12px] text-ink3/70 mt-1">
-                  {featuredTranslation.ethnic_group.name} · {featuredTranslation.ethnic_group.country_iso2}
+                  {featuredTranslation.ethnic_groups.map(eg => `${eg.name} · ${eg.country_iso2}`).join(", ")}
                 </p>
               )}
               <div className="flex items-center gap-3 mt-2">
@@ -241,14 +205,14 @@ export default function WordDetail({ concept, similarWords, featuredLang, moreIn
               {otherTranslations.map((t) => (
                 <Link
                   key={t.id}
-                  href={`/words/${concept.slug}?lang=${t.language.code}`}
+                  href={`/words/${concept.slug}?lang=${t.languages[0]?.code ?? ""}`}
                   className="relative group block px-5 py-4 border-r border-b border-border last:border-b-0 no-underline hover:bg-ochre/[0.03] transition-colors"
                 >
                   <div className="flex items-center gap-2 mb-1.5">
                     <span
                       className="text-[10px] font-medium text-ink3 tracking-[0.08em] uppercase"
                     >
-                      {t.language.name}
+                      {t.languages.map(l => l.name).join(", ")}
                     </span>
                     {t.is_precolonial && (
                       <span className="text-[9px] bg-forest/[0.08] text-forest px-1.5 py-px rounded tracking-[0.05em]">
@@ -273,14 +237,14 @@ export default function WordDetail({ concept, similarWords, featuredLang, moreIn
                     </div>
                   )}
 
-                  {t.ethnic_group && (
+                  {t.ethnic_groups.length > 0 && (
                     <div className="text-[10px] text-ink3/70 mt-1.5">
-                      {t.ethnic_group.name} · {t.ethnic_group.country_iso2}
+                      {t.ethnic_groups.map(eg => `${eg.name} · ${eg.country_iso2}`).join(", ")}
                     </div>
                   )}
 
                   <button
-                    onClick={(e) => { e.preventDefault(); openCorrection(t.language.name, t.word); }}
+                    onClick={(e) => { e.preventDefault(); openCorrection(t.languages.map(l => l.name).join(", "), t.word); }}
                     className="absolute top-3 right-3 text-[10px] text-ink3 bg-bg2 border border-border rounded-[3px] px-[7px] py-0.5 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity font-[family-name:var(--font-jost)] hover:text-ochre-d hover:border-border2"
                   >
                     Correct
@@ -292,53 +256,62 @@ export default function WordDetail({ concept, similarWords, featuredLang, moreIn
         </div>
 
         {/* Add translation CTA */}
-        <div className="flex items-center justify-between bg-ochre/[0.04] border border-border rounded-lg px-5 py-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-ochre/[0.04] border border-border rounded-lg px-5 py-4">
           <span className="text-[13px] text-ink3">
-            Know <strong className="text-ink2 font-medium">{concept.english_term}</strong> in another language?
+            Know <strong className="text-ink2 font-medium">{concept.english_term}</strong> in another language or meaning?
           </span>
-          <button
-            onClick={openAddTranslation}
-            className="text-[12px] font-medium text-cream bg-ink border-none px-5 py-2.5 rounded cursor-pointer font-[family-name:var(--font-jost)] tracking-[0.05em] uppercase hover:bg-ochre-d transition-colors"
-          >
-            + Add translation
-          </button>
+          <div className="flex gap-2.5">
+            <button
+              onClick={openAddTranslation}
+              className="text-[12px] font-medium text-cream bg-ink border-none px-5 py-2.5 rounded cursor-pointer font-[family-name:var(--font-jost)] tracking-[0.05em] uppercase hover:bg-ochre-d transition-colors"
+            >
+              + Add translation
+            </button>
+            <button
+              onClick={() => {
+                setModalType("new_concept");
+                setPrefill({});
+                setModalOpen(true);
+              }}
+              className="text-[12px] font-medium text-ink bg-transparent border border-border px-5 py-2.5 rounded cursor-pointer font-[family-name:var(--font-jost)] tracking-[0.05em] uppercase hover:border-ochre hover:text-ochre-d transition-colors"
+            >
+              + Other meaning
+            </button>
+          </div>
         </div>
 
         {/* Other meanings — when the same word means something else */}
-        {featuredTranslation && otherMeanings.length > 0 && (
+        {Object.keys(otherMeaningsMap).length > 0 && (
           <div className="mt-10">
-            <h2 className="text-[11px] font-medium text-ink3 tracking-[0.1em] uppercase mb-4">
-              Other meanings of &ldquo;{featuredTranslation.word}&rdquo;
+            <h2 className="font-[family-name:var(--font-cormorant)] text-[28px] font-bold text-ink mb-6">
+              Other meanings
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 bg-cream border border-border rounded-lg overflow-hidden">
-              {otherMeanings.map((c) => {
-                const matchingTranslation = c.translations.find(
-                  (t) => t.language.code === featuredLang!.code
-                );
-                return (
-                  <Link
-                    key={c.id}
-                    href={`/words/${c.slug}?lang=${featuredLang!.code}`}
-                    className="block px-5 py-4 border-r border-b border-border hover:bg-ochre/[0.03] transition-colors group no-underline"
-                  >
-                    <div className="font-[family-name:var(--font-cormorant)] text-[24px] font-semibold text-ink group-hover:text-ochre-d transition-colors leading-tight">
-                      {c.english_term}
-                    </div>
-                    {c.definition && (
-                      <div className="text-[11px] text-ink3 mt-0.5 italic">{c.definition}</div>
-                    )}
-                    {matchingTranslation?.phonetic && (
-                      <div className="text-[11px] text-ink3 mt-1 font-[family-name:var(--font-dm-mono)]">
-                        /{matchingTranslation.phonetic}/
+            {Object.entries(otherMeaningsMap).map(([wordLabel, concepts]) => (
+              <div key={wordLabel} className="mb-6">
+                <h3 className="text-[11px] font-medium text-ink3 tracking-[0.1em] uppercase mb-3">
+                  &ldquo;{wordLabel}&rdquo; also means
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 bg-cream border border-border rounded-lg overflow-hidden">
+                  {concepts.map((c) => (
+                    <Link
+                      key={c.id}
+                      href={`/words/${c.slug}`}
+                      className="block px-5 py-4 border-r border-b border-border hover:bg-ochre/[0.03] transition-colors group no-underline"
+                    >
+                      <div className="font-[family-name:var(--font-cormorant)] text-[24px] font-semibold text-ink group-hover:text-ochre-d transition-colors leading-tight">
+                        {c.english_term}
                       </div>
-                    )}
-                    <div className="text-[10px] text-ink3/70 mt-1.5">
-                      {CATEGORY_LABELS[c.category] ?? c.category}
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
+                      {c.definition && (
+                        <div className="text-[11px] text-ink3 mt-0.5 italic">{c.definition}</div>
+                      )}
+                      <div className="text-[10px] text-ink3/70 mt-1.5">
+                        {CATEGORY_LABELS[c.category] ?? c.category}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         )}
 

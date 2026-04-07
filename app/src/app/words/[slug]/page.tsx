@@ -62,7 +62,6 @@ export default async function WordPage({ params, searchParams }: Props) {
   // If a language is specified, fetch language info + more words from that language
   let featuredLang: LanguageWithCount | null = null;
   let moreInLanguage: TranslationWithConcept[] = [];
-  let otherMeanings: ConceptDetail[] = [];
 
   if (langCode) {
     try {
@@ -74,26 +73,33 @@ export default async function WordPage({ params, searchParams }: Props) {
       moreInLanguage = langTranslations
         .filter((t) => t.concept_slug !== concept.slug && t.concept_category === concept.category)
         .slice(0, 8);
-
-      // Find the featured translation to look up other meanings
-      const featuredTranslation = concept.translations.find(
-        (t) => t.language.code === langCode
-      );
-      if (featuredTranslation) {
-        try {
-          otherMeanings = await getOtherMeanings(
-            concept.slug,
-            featuredTranslation.word,
-            langCode
-          );
-        } catch {
-          // Non-critical
-        }
-      }
     } catch {
       // Fall back to default view
     }
   }
+
+  // Fetch other meanings for each unique word in the concept's translations (parallel)
+  const otherMeaningsMap: Record<string, ConceptDetail[]> = {};
+  const seenWords = new Set<string>();
+  const uniqueTranslations: { word: string; langCode: string; langName: string }[] = [];
+  for (const t of concept.translations) {
+    for (const lang of t.languages) {
+      const key = `${t.word.toLowerCase()}|${lang.code}`;
+      if (seenWords.has(key)) continue;
+      seenWords.add(key);
+      uniqueTranslations.push({ word: t.word, langCode: lang.code, langName: lang.name });
+    }
+  }
+
+  const otherResults = await Promise.allSettled(
+    uniqueTranslations.map((t) => getOtherMeanings(concept.slug, t.word, t.langCode))
+  );
+  otherResults.forEach((result, i) => {
+    if (result.status === "fulfilled" && result.value.length > 0) {
+      const t = uniqueTranslations[i];
+      otherMeaningsMap[`${t.word} (${t.langName})`] = result.value;
+    }
+  });
 
   return (
     <WordDetail
@@ -101,7 +107,7 @@ export default async function WordPage({ params, searchParams }: Props) {
       similarWords={similarWords}
       featuredLang={featuredLang}
       moreInLanguage={moreInLanguage}
-      otherMeanings={otherMeanings}
+      otherMeaningsMap={otherMeaningsMap}
     />
   );
 }

@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import HomeContent from "./HomeContent";
 import { listConcepts, listLanguages, listCountries } from "@/lib/api";
 
@@ -20,9 +19,5 @@ export default async function HomePage() {
     // Fall back to zeros — page still works
   }
 
-  return (
-    <Suspense>
-      <HomeContent stats={stats} />
-    </Suspense>
-  );
+  return <HomeContent stats={stats} />;
 }

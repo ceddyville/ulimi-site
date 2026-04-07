@@ -34,7 +34,7 @@ export default function ResultCard({ concept }: ResultCardProps) {
         <div className="px-[22px] py-3.5 flex flex-wrap items-baseline gap-x-5 gap-y-1.5">
           {preview.map((t) => (
             <span key={t.id} className="inline-flex items-baseline gap-1.5">
-              <span className="text-[10px] text-ink3 tracking-[0.06em] uppercase">{t.language.name}</span>
+              <span className="text-[10px] text-ink3 tracking-[0.06em] uppercase">{t.languages.map(l => l.name).join(", ")}</span>
               <span className="font-[family-name:var(--font-cormorant)] text-[19px] font-semibold text-ink">{t.word}</span>
             </span>
           ))}
