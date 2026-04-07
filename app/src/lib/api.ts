@@ -9,13 +9,20 @@ import type {
   TranslationWithConcept,
 } from "./types";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL;
-if (!API_BASE) {
+const SERVER_API_BASE = process.env.NEXT_PUBLIC_API_URL;
+if (!SERVER_API_BASE) {
   throw new Error("NEXT_PUBLIC_API_URL environment variable is required");
 }
 
+// On the server (SSR), call the backend directly.
+// In the browser, use the /proxy rewrite to avoid mixed-content (https→http) blocks.
+function getApiBase() {
+  if (typeof window === "undefined") return SERVER_API_BASE;
+  return "/proxy/api/v1";
+}
+
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const url = `${API_BASE}${path}`;
+  const url = `${getApiBase()}${path}`;
   const res = await fetch(url, {
     ...init,
     cache: "no-store",
