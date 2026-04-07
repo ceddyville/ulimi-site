@@ -6,7 +6,7 @@ import WordDetail from "./WordDetail";
 
 interface Props {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ lang?: string }>;
+  searchParams: Promise<{ lang?: string; word?: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function WordPage({ params, searchParams }: Props) {
   const { slug } = await params;
-  const { lang: langCode } = await searchParams;
+  const { lang: langCode, word: searchedWord } = await searchParams;
 
   let concept;
   try {
@@ -63,11 +63,22 @@ export default async function WordPage({ params, searchParams }: Props) {
   let featuredLang: LanguageWithCount | null = null;
   let moreInLanguage: TranslationWithConcept[] = [];
 
-  if (langCode) {
+  // Determine the language to feature: explicit ?lang= param, or infer from ?word= match
+  let effectiveLangCode = langCode;
+  if (!effectiveLangCode && searchedWord) {
+    const matchedTranslation = concept.translations.find(
+      (t) => t.word.toLowerCase() === searchedWord.toLowerCase()
+    );
+    if (matchedTranslation && matchedTranslation.languages.length > 0) {
+      effectiveLangCode = matchedTranslation.languages[0].code;
+    }
+  }
+
+  if (effectiveLangCode) {
     try {
       const [langInfo, langTranslations] = await Promise.all([
-        getLanguage(langCode),
-        getLanguageTranslations(langCode),
+        getLanguage(effectiveLangCode),
+        getLanguageTranslations(effectiveLangCode),
       ]);
       featuredLang = langInfo;
       moreInLanguage = langTranslations

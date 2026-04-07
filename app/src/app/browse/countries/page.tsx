@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default async function CountriesPage() {
   let countries: CountrySummary[];
   try {
-    countries = await listCountries();
+    countries = await listCountries({ min_words: 20 });
   } catch {
     countries = [];
   }

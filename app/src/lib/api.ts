@@ -100,8 +100,11 @@ export function listCategories() {
   return apiFetch<CategorySummary[]>("/concepts/categories/");
 }
 
-export function listLanguages() {
-  return apiFetch<LanguageWithCount[]>("/languages/");
+export function listLanguages(params?: { min_words?: number }) {
+  const sp = new URLSearchParams();
+  if (params?.min_words) sp.set("min_words", String(params.min_words));
+  const qs = sp.toString();
+  return apiFetch<LanguageWithCount[]>(`/languages/${qs ? `?${qs}` : ""}`);
 }
 
 export function getLanguage(code: string) {
@@ -114,6 +117,9 @@ export function getLanguageTranslations(code: string) {
   );
 }
 
-export function listCountries() {
-  return apiFetch<CountrySummary[]>("/languages/countries/");
+export function listCountries(params?: { min_words?: number }) {
+  const sp = new URLSearchParams();
+  if (params?.min_words) sp.set("min_words", String(params.min_words));
+  const qs = sp.toString();
+  return apiFetch<CountrySummary[]>(`/languages/countries/${qs ? `?${qs}` : ""}`);
 }

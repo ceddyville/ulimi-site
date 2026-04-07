@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default async function LanguagesPage() {
   let languages: LanguageWithCount[];
   try {
-    languages = await listLanguages();
+    languages = await listLanguages({ min_words: 20 });
   } catch {
     languages = [];
   }

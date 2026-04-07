@@ -20,9 +20,5 @@ export default async function SearchPage({
     results = [];
   }
 
-  if (results.length === 1) {
-    redirect(`/words/${results[0].slug}`);
-  }
-
   return <SearchResults query={query} results={results} />;
 }

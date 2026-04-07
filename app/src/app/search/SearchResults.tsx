@@ -53,7 +53,7 @@ export default function SearchResults({ query, results }: Props) {
 
         {results.map((concept) => (
           <div key={concept.id} className="mb-4">
-            <ResultCard concept={concept} />
+            <ResultCard concept={concept} searchedWord={query} />
           </div>
         ))}
       </main>

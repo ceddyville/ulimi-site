@@ -5,15 +5,20 @@ import type { ConceptDetail } from "@/lib/types";
 
 interface ResultCardProps {
   concept: ConceptDetail;
+  searchedWord?: string;
 }
 
-export default function ResultCard({ concept }: ResultCardProps) {
+export default function ResultCard({ concept, searchedWord }: ResultCardProps) {
   const preview = concept.translations.slice(0, 4);
   const remaining = concept.translation_count - preview.length;
 
+  const href = searchedWord
+    ? `/words/${concept.slug}?word=${encodeURIComponent(searchedWord)}`
+    : `/words/${concept.slug}`;
+
   return (
     <Link
-      href={`/words/${concept.slug}`}
+      href={href}
       className="block bg-cream border border-border rounded-[10px] overflow-hidden hover:border-border2 transition-colors group no-underline"
     >
       {/* Header */}

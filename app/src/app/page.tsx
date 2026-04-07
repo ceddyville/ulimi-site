@@ -6,8 +6,8 @@ export default async function HomePage() {
   try {
     const [concepts, languages, countries] = await Promise.all([
       listConcepts(),
-      listLanguages(),
-      listCountries(),
+      listLanguages({ min_words: 20 }),
+      listCountries({ min_words: 20 }),
     ]);
     stats = {
       languages: languages.length,
