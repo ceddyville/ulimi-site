@@ -100,6 +100,10 @@ export function listCategories() {
   return apiFetch<CategorySummary[]>("/concepts/categories/");
 }
 
+export function getDictionaryStats() {
+  return apiFetch<{ concept_count: number; translation_count: number }>("/concepts/stats/");
+}
+
 export function listLanguages(params?: { min_words?: number }) {
   const sp = new URLSearchParams();
   if (params?.min_words) sp.set("min_words", String(params.min_words));

@@ -7,7 +7,21 @@ import Footer from "@/components/Footer";
 import SearchBar from "@/components/SearchBar";
 import ContributeModal from "@/components/ContributeModal";
 
-export default function HomeContent({ stats }: { stats: { languages: number; words: number; countries: number } }) {
+export interface HeroCard {
+  slug: string;
+  title: string;
+  category: string;
+  rows: { lang: string; word: string; note: string }[];
+  context: string;
+}
+
+export default function HomeContent({
+  stats,
+  heroCard,
+}: {
+  stats: { languages: number; concepts: number; translations: number; countries: number };
+  heroCard: HeroCard;
+}) {
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<ContributionType>("new_concept");
@@ -60,29 +74,28 @@ export default function HomeContent({ stats }: { stats: { languages: number; wor
           </div>
         </div>
 
-        {/* Hero card — static preview */}
-        <div className="bg-cream border border-border rounded-[14px] overflow-hidden shadow-[6px_12px_40px_rgba(44,24,16,0.1)]">
+        {/* Hero card — live from API */}
+        <a
+          href={`/words/${heroCard.slug}`}
+          className="block bg-cream border border-border rounded-[14px] overflow-hidden shadow-[6px_12px_40px_rgba(44,24,16,0.1)] no-underline hover:shadow-[6px_16px_48px_rgba(44,24,16,0.15)] transition-shadow"
+        >
           <div className="bg-ink px-[22px] py-[18px] flex items-center gap-2.5">
-            <span className="font-[family-name:var(--font-cormorant)] text-[22px] font-semibold text-cream flex-1">Rain</span>
-            <span className="text-[10px] font-medium tracking-[0.1em] uppercase text-ochre-l border border-ochre-l/35 px-2.5 py-[3px] rounded-[3px]">Nature</span>
+            <span className="font-[family-name:var(--font-cormorant)] text-[22px] font-semibold text-cream flex-1">{heroCard.title}</span>
+            <span className="text-[10px] font-medium tracking-[0.1em] uppercase text-ochre-l border border-ochre-l/35 px-2.5 py-[3px] rounded-[3px]">{heroCard.category}</span>
           </div>
-          {[
-            { lang: "Swahili", word: "Mvua", note: "" },
-            { lang: "Zulu", word: "Imvula", note: "sacred at royal kraal" },
-            { lang: "Luo", word: "Koth", note: "rainmaker: Onjinjo" },
-            { lang: "Kikuyu", word: "Mũũgũ", note: "prayers to Ngai" },
-            { lang: "Hausa", word: "Ruwa", note: "also means water" },
-          ].map((row, i, arr) => (
-            <div key={row.lang} className={`flex items-baseline justify-between px-[22px] py-[13px] ${i < arr.length - 1 ? "border-b border-border" : ""}`}>
+          {heroCard.rows.map((row, i, arr) => (
+            <div key={`${row.lang}-${i}`} className={`flex items-baseline justify-between px-[22px] py-[13px] ${i < arr.length - 1 ? "border-b border-border" : ""}`}>
               <span className="text-[11px] text-ink3 w-[72px] font-medium tracking-[0.04em] shrink-0">{row.lang}</span>
               <span className="font-[family-name:var(--font-cormorant)] text-[21px] font-semibold text-ink flex-1">{row.word}</span>
               <span className="text-[11px] text-ink3 text-right italic max-w-[130px]">{row.note}</span>
             </div>
           ))}
-          <div className="bg-ochre/[0.07] border-t border-border2 px-[22px] py-[13px] text-[12px] text-ochre-d leading-[1.55] italic">
-            &ldquo;Rain ceremonies and rainmakers were central to pre-colonial governance across the continent.&rdquo;
-          </div>
-        </div>
+          {heroCard.context && (
+            <div className="bg-ochre/[0.07] border-t border-border2 px-[22px] py-[13px] text-[12px] text-ochre-d leading-[1.55] italic">
+              &ldquo;{heroCard.context}&rdquo;
+            </div>
+          )}
+        </a>
       </section>
 
       {/* Divider */}
@@ -93,10 +106,11 @@ export default function HomeContent({ stats }: { stats: { languages: number; wor
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 max-w-[1000px] mx-auto mb-[60px] px-12 gap-px bg-border border border-border rounded-lg overflow-hidden animate-[fadeUp_0.6s_0.1s_ease_both]">
+      <div className="grid grid-cols-2 md:grid-cols-5 max-w-[1000px] mx-auto mb-[60px] px-12 gap-px bg-border border border-border rounded-lg overflow-hidden animate-[fadeUp_0.6s_0.1s_ease_both]">
         {[
           { num: String(stats.languages), label: "Languages", href: "/browse/languages" },
-          { num: String(stats.words), label: "Words", href: "/browse/categories" },
+          { num: String(stats.concepts), label: "Words", href: "/browse/categories" },
+          { num: stats.translations.toLocaleString(), label: "Translations", href: "/browse/categories" },
           { num: String(stats.countries), label: "Countries", href: "/browse/countries" },
           { num: "100%", label: "Open source", href: "https://github.com/ceddyville/ulimi-api" },
         ].map((s) => (
@@ -124,7 +138,7 @@ export default function HomeContent({ stats }: { stats: { languages: number; wor
           { num: "01", title: "Bidirectional search", desc: "Search \u201clion\u201d or search \u201csimba\u201d \u2014 either direction returns the same word with all its translations across every language in the database." },
           { num: "02", title: "Pre-colonial context", desc: "Every entry carries the story of what a word meant before colonisation \u2014 recovering the names and meanings that existed long before European naming systems arrived.", accent: true },
           { num: "03", title: "Community contributed", desc: "Native speakers, scholars, and elders submit words and corrections. Every contribution goes through admin review before going live. The dictionary grows with the community." },
-          { num: "04", title: "Kabila API linked", desc: "Each translation connects to its ethnic group \u2014 linking language to clan, kingdom, and cultural lineage across the continent." },
+          { num: "04", title: "Ethnic & cultural context", desc: "Each translation connects to its ethnic group \u2014 linking language to clan, kingdom, and cultural lineage across the continent." },
         ].map((f) => (
           <div key={f.num} className={`bg-cream p-[34px] ${f.accent ? "bg-ochre/[0.04] border-l-[3px] border-l-ochre" : ""}`}>
             <div className="font-[family-name:var(--font-cormorant)] text-[52px] font-bold text-surface2 leading-none mb-3.5">{f.num}</div>
