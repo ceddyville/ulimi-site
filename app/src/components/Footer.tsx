@@ -53,6 +53,9 @@ export default function Footer() {
           >
             GitHub
           </a>
+          <Link href="/admin-login" className="block text-[13px] text-cream/55 no-underline mb-[7px] hover:text-cream transition-colors">
+            Admin
+          </Link>
         </div>
       </div>
     </footer>
