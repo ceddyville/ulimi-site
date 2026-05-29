@@ -48,7 +48,9 @@ function AdminLoginForm() {
     }
   }
 
-  return checking ? null : (
+  if (checking) return null;
+
+  return (
     <div className="w-full max-w-[360px]">
       <div className="text-center mb-8">
         <div className="text-[11px] font-medium tracking-[0.15em] uppercase text-ink3 mb-2">
