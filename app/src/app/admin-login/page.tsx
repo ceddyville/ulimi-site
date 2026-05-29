@@ -48,9 +48,7 @@ function AdminLoginForm() {
     }
   }
 
-  if (checking) return null;
-
-  return (
+  return checking ? null : (
     <div className="w-full max-w-[360px]">
       <div className="text-center mb-8">
         <div className="text-[11px] font-medium tracking-[0.15em] uppercase text-ink3 mb-2">
@@ -123,7 +121,7 @@ export default function AdminLoginPage() {
     </div>
   );
 }
-  const [username, setUsername] = useState("");
+
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
